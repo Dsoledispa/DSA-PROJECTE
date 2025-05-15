@@ -9,5 +9,6 @@ public class Jackson extends ResourceConfig {
         packages("edu.upc.dsa.services"); // Paquete donde están tus recursos REST
         register(JacksonFeature.class);  // Registra Jackson para JSON
         register(edu.upc.dsa.config.JWTAuthFilter.class); //Registro directo para JWT
+        register(edu.upc.dsa.config.CORSFilter.class); // REGISTRO DEL FILTRO CORS
     }
 }
