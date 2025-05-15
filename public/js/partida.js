@@ -1,5 +1,5 @@
 const isEmulator = /Android/i.test(navigator.userAgent);
-const BASE_URL = isEmulator ? "http://10.0.2.2:8080/dsaApp" : "http://192.168.10.92:8080/dsaApp";
+const BASE_URL = isEmulator ? "http://10.0.2.2:8080/dsaApp" : "http://dsa1.upc.edu/dsaApp";
 const token = localStorage.getItem("token");
 
 function mostrarSpinner() {
