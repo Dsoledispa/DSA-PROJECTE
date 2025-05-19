@@ -1,36 +1,33 @@
 package edu.upc.dsa.manager;
 
+import edu.upc.dsa.models.Objeto;
 import edu.upc.dsa.models.Partida;
 
 import java.util.List;
 
 public interface PartidaManager {
-
-    //Funciona como crear partida
-    //id_usuario es el nombre del usuario
-    //Es el que finalmente crea
+    // Métodos originales
     Partida addPartida(Partida p);
-    //Es para tests
     Partida addPartida(String id_partida, String id_usuario, Integer vidas, Integer monedas, Integer puntuacion);
-    //Es para a partir de id_usuario, crear el objeto p
     Partida addPartida(String id_usuario);
-
-    //Obtener todas las partidas de un usuario
     List<Partida> getPartidas(String id_usuario);
-
-    // Obtener una partida específica de un usuario
     Partida getPartida(String id_usuario, String id_partida);
-
     void deletePartida(String id_usuario, String id_partida);
-
-    /// Obtener las monedas de una partida específica del usuario
     int getMonedasDePartida(String id_usuario, String id_partida);
-
-    //Por ahora no
-    //Partida addPuntuacion(String usuario);
-
-    //Elimina todas las partidas de todos los usuarios
     void clear();
-    //solo de un usuario
     int sizePartidas(String id_usuario);
+
+    // Métodos adicionales para alinearse con IPartidaDAO
+    boolean actualizarPartida(Partida partida);
+    boolean actualizarVidas(String id_partida, int vidas);
+    boolean actualizarMonedas(String id_partida, int monedas);
+    boolean actualizarPuntuacion(String id_partida, int puntuacion);
+    List<Objeto> obtenerInventario(String id_partida);
+    boolean añadirObjetoInventario(String id_partida, String objeto, int cantidad);
+    boolean eliminarObjetoInventario(String id_partida, String objeto, int cantidad);
+    boolean comprarObjeto(String id_partida, String objeto);
+    boolean tieneMonedasSuficientes(String id_partida, String objeto);
+    boolean usarObjeto(String id_partida, String objeto);
+    List<Objeto> verInventario(String id_partida);
+    String getMensajeResultado();
 }

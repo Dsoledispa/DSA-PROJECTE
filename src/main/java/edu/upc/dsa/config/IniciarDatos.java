@@ -1,7 +1,6 @@
 package edu.upc.dsa.config;
 
 import edu.upc.dsa.manager.TiendaManager;
-import edu.upc.dsa.manager.TiendaManagerImpl;
 import edu.upc.dsa.manager.UsuarioManager;
 import edu.upc.dsa.manager.UsuarioManagerImpl;
 import edu.upc.dsa.models.CategoriaObjeto;

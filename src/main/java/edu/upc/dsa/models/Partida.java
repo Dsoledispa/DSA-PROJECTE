@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Partida {
-
     private String id_partida;
-    // id_usuario es el nombre del usuario
     private String id_usuario;
     private Integer vidas;
     private Integer monedas;
@@ -21,8 +19,8 @@ public class Partida {
     }
 
     public Partida(String id_partida, String id_usuario, Integer vidas, Integer monedas, Integer puntuacion) {
-        this(); // Llama al constructor sin parámetros (asigna un id aleatorio).
-        if (id_partida != null) setId_partida(id_partida); // Si se proporciona un id, lo sobrescribe.
+        this();
+        if (id_partida != null) setId_partida(id_partida);
         setId_usuario(id_usuario);
         setVidas(vidas);
         setMonedas(monedas);
@@ -44,7 +42,11 @@ public class Partida {
     public Integer getPuntuacion() { return puntuacion; }
     public void setPuntuacion(Integer puntuacion) { this.puntuacion = puntuacion; }
 
-    public List<Objeto> getInventario() { return inventario; }
+    public List<Objeto> getInventario() {
+        if (inventario == null) inventario = new ArrayList<>();
+        return inventario;
+    }
+
     public void setInventario(List<Objeto> inventario) { this.inventario = inventario; }
 
     @Override
@@ -52,5 +54,4 @@ public class Partida {
         return "Partida [id_partida=" + id_partida + ", id_usuario=" + id_usuario + ", vidas=" + vidas +
                 ", monedas=" + monedas + ", puntuacion=" + puntuacion + ", inventario=" + inventario + "]";
     }
-
 }

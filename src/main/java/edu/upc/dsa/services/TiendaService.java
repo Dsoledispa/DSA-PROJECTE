@@ -2,7 +2,6 @@ package edu.upc.dsa.services;
 
 import edu.upc.dsa.config.IniciarDatos;
 import edu.upc.dsa.manager.TiendaManager;
-import edu.upc.dsa.manager.TiendaManagerImpl;
 import edu.upc.dsa.models.CategoriaObjeto;
 import edu.upc.dsa.models.Objeto;
 import io.swagger.annotations.*;

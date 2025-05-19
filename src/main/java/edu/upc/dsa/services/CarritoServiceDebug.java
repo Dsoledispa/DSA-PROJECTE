@@ -4,7 +4,6 @@ import edu.upc.dsa.config.IniciarDatos;
 import edu.upc.dsa.manager.CarritoManager;
 import edu.upc.dsa.manager.CarritoManagerImpl;
 import edu.upc.dsa.manager.TiendaManager;
-import edu.upc.dsa.manager.TiendaManagerImpl;
 import edu.upc.dsa.models.Objeto;
 import io.swagger.annotations.*;
 import org.apache.log4j.Logger;

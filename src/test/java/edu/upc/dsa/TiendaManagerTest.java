@@ -1,7 +1,6 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.manager.TiendaManager;
-import edu.upc.dsa.manager.TiendaManagerImpl;
 import edu.upc.dsa.models.CategoriaObjeto;
 import edu.upc.dsa.models.Objeto;
 import edu.upc.dsa.util.IniciarDatosTests;
@@ -42,7 +41,7 @@ public class TiendaManagerTest {
     public void testGetProductoPorCategoria() {
         List<Objeto> armas = this.tm.getProductosPorCategoria(CategoriaObjeto.ARMAS);
         assertEquals(1, armas.size());
-        assertEquals("Espada", armas.get(0).getNombre());
+        assertEquals("Espada", armas.get(0).getObjeto());
     }
 
     @Test
