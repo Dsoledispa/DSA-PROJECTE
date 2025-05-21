@@ -1,4 +1,4 @@
-package edu.upc.dsa;
+package edu.upc.dsa.modelTest;
 
 import edu.upc.dsa.manager.*;
 import edu.upc.dsa.util.IniciarDatosTests;

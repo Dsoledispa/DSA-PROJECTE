@@ -1,4 +1,4 @@
-package edu.upc.dsa;
+package edu.upc.dsa.modelTest;
 
 import edu.upc.dsa.exceptions.usuario.PasswordNotMatchException;
 import edu.upc.dsa.exceptions.usuario.UsuarioNotFoundException;

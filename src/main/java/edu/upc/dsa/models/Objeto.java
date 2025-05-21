@@ -9,7 +9,6 @@ public class Objeto {
     private String imagen; // ruta de imagen, pensando en BBDD
     private String descripcion;
     private CategoriaObjeto categoria;
-    //private int stock;
 
     public Objeto(){
         setId_objeto(RandomUtils.getId());
