@@ -2,6 +2,7 @@ package edu.upc.dsa.db.orm;
 
 import edu.upc.dsa.db.orm.util.ObjectHelper;
 import edu.upc.dsa.db.orm.util.QueryHelper;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import java.util.List;
  * Esta clase convierte objetos Java en registros de base de datos y viceversa.
  */
 public class SessionImpl implements Session {
+
+    final static Logger logger = Logger.getLogger(SessionImpl.class);
     // Conexión a la base de datos
     private final Connection conexion;
 
@@ -35,7 +38,6 @@ public class SessionImpl implements Session {
         try {
             // Preparar la consulta
             statement = conexion.prepareStatement(consultaInsert);
-
             // Obtener los campos del objeto
             String[] nombresCampos = ObjectHelper.getFields(objeto);
             int posicionParametro = 1;
@@ -48,6 +50,7 @@ public class SessionImpl implements Session {
                     statement.setObject(posicionParametro++, valorCampo);
                 }
             }
+            logger.info(statement);
 
             // Ejecutar la consulta
             statement.executeUpdate();
