@@ -1,7 +1,15 @@
 package edu.upc.dsa.models;
 
+import edu.upc.dsa.util.annotations.*;
+
+@Table(name="categoria_objeto")
 public class CategoriaObjeto {
+
+    @Id
+    @Column(name="id_categoria")
     private int id_categoria;
+
+    @Column(name="nombre")
     private String nombre;
 
     public CategoriaObjeto() {}

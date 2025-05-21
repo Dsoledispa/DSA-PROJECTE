@@ -1,18 +1,32 @@
 package edu.upc.dsa.models;
 
 import edu.upc.dsa.util.RandomUtils;
+import edu.upc.dsa.util.annotations.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Table(name = "partida")
 public class Partida {
 
+    @Id
+    @Column(name = "id_partida")
     private String id_partida;
+
     // id_usuario es el nombre del usuario
+    @JoinColumn(name = "id_usuario", referencedColumnName = "nombreUsu")
     private String id_usuario;
+
+    @Column(name = "vidas")
     private Integer vidas;
+
+    @Column(name = "monedas")
     private Integer monedas;
+
+    @Column(name = "puntuacion")
     private Integer puntuacion;
+
+    @Ignore
     private List<Objeto> inventario;
 
     public Partida() {

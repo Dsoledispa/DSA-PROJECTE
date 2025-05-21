@@ -12,8 +12,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class ObjectHelper {
+    // Este archivo literalmente son los getters y los setters de los modelos
+    // Pero para usar con la base de datos
 
     final static Logger logger = Logger.getLogger(ObjectHelper.class);
+
+    // Este es para obtener los nombres de los atributos del objeto
     public static String[] getFields(Object entity) {
 
         Class theClass = entity.getClass();
@@ -30,34 +34,33 @@ public class ObjectHelper {
     }
 
 
+    //property es el atributo del objeto
     public static void setter(Object object, String property, Object value) {
-        // Method // invoke
-        List<Method> methods = new ArrayList<>(Arrays.asList(object.getClass().getDeclaredMethods()));
         try {
-            Method m = methods.stream().filter((Method method) -> method.getName().contains("set" + getMethodName(property))).findFirst().get();
-            m.invoke(object,  value);
-        }catch (NoSuchElementException | IllegalAccessException | InvocationTargetException e){
-            logger.info("Error invocando setter para propiedad " + property + ": " + e.getMessage());
+            // Obtenemos el tipo de atributo, ej string nombre
+            Field field = object.getClass().getDeclaredField(property);
+            Class fieldType = field.getType();
 
-        }
-
-    }
-
-    public static String getMethodName(String property) {
-        return property.substring(0,1).toUpperCase()+property.substring(1);
-    }
-
-    public static Object getter(Object object, String property) {
-        String propToUppercase = property.substring(0, 1).toUpperCase() + property.substring(1);
-        String getterName = "get" + propToUppercase;
-        try {
-            Method m = object.getClass().getDeclaredMethod(getterName);
-            Object o = m.invoke(object);
-            return o;
-
-        }catch (NoSuchMethodException e){
+            // Construimos el setter, ej setNombre
+            String methodName = "set" + property.substring(0, 1).toUpperCase() + property.substring(1);
+            // Obtenemos el setter
+            Method method = object.getClass().getMethod(methodName, fieldType);
+            // Ejecutamos el setter
+            method.invoke(object, value);
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
+        }
+    }
+
+    //property es el atributo del objeto
+    public static Object getter(Object object, String property) {
+        try {
+            // Construimos el getter, ej getNombre
+            String methodName = "get" + property.substring(0, 1).toUpperCase() + property.substring(1);
+            // Obtenemos el getter
+            Method method = object.getClass().getMethod(methodName);
+            // Ejecutamos el getter
+            return method.invoke(object);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

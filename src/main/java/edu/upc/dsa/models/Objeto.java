@@ -1,13 +1,28 @@
 package edu.upc.dsa.models;
 
 import edu.upc.dsa.util.RandomUtils;
+import edu.upc.dsa.util.annotations.*;
 
+@Table(name="objeto")
 public class Objeto {
+
+    @Id
+    @Column(name="id_objeto")
     private String id_objeto;
+
+    @Column(name="nombre")
     private String nombre;
+
+    @Column(name="precio")
     private int precio;
+
+    @Column(name="imagen")
     private String imagen; // ruta de imagen, pensando en BBDD
+
+    @Column(name="descripcion")
     private String descripcion;
+
+    @JoinColumn(name="id_categoria", referencedColumnName = "id_categoria")
     private CategoriaObjeto categoria;
 
     public Objeto(){

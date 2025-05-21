@@ -59,9 +59,11 @@ public class DBUtils {
      * (Opcional) Método adicional para obtener directamente una Connection
      * sin pasar por FactorySession.
      */
+    /*
     public static Connection getConnection() throws SQLException {
         String url = "jdbc:mariadb://" + HOST + ":" + PORT + "/" + DB;
         return DriverManager.getConnection(url, USER, PASS);
     }
+    */
 }
 

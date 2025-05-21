@@ -1,11 +1,21 @@
 package edu.upc.dsa.models;
 
+import edu.upc.dsa.util.annotations.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Table(name="usuario")
 public class Usuario {
+
+    @Id
+    @Column(name="nombreUsu")
     private String nombreUsu;
+
+    @Column(name="password")
     private String password;
+
+    @Ignore
     private List<Partida> partidas;
 
     public Usuario() {
