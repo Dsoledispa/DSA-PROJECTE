@@ -2,168 +2,120 @@ package edu.upc.dsa.db.orm.util;
 
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
+import edu.upc.dsa.util.annotations.*;
 
-/**
- * Clase de utilidad para generar consultas SQL a partir de objetos y clases.
- * Permite trabajar con cualquier tabla de forma genérica.
- */
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+
 public class QueryHelper {
 
-    final static Logger logger = Logger.getLogger(QueryHelper.class);
+    // Devuelve el nombre de la tabla como un String.
+    public static String getTableName(Class<?> clazz) {
 
-    /**
-     * Crea una consulta SQL INSERT para guardar un objeto en la base de datos.
-     *
-     * @param objeto El objeto a insertar
-     * @return Consulta SQL INSERT preparada
-     */
-    public static String createQueryINSERT(Object objeto) {
-        // Obtener el nombre de la tabla desde la clase del objeto
-        String nombreTabla = obtenerNombreTabla(objeto.getClass());
+        // Se verifica si la clase tiene la anotación @Table.
+        if (clazz.isAnnotationPresent(Table.class)) {
+            return clazz.getAnnotation(Table.class).name();
+        }
+        // Si la anotación no está presente, se devuelve el nombre de la clase en minúsculas como nombre de la tabla por defecto.
+        return clazz.getSimpleName().toLowerCase();
+    }
 
-        StringBuilder consulta = new StringBuilder("INSERT INTO ")
-                .append(nombreTabla)
-                .append(" (");
+    // Recibe como parámetro la clase del modelo (clazz) de la que se quiere generar la consulta SQL de inserción.
+    public static InsertQuery createInsertQuery(Class<?> clazz) {
+        String table = getTableName(clazz);
 
-        // Obtener los nombres de los campos del objeto
-        String[] nombresCampos = ObjectHelper.getFields(objeto);
-        boolean esPrimerCampo = true;
+        // columns guardará los nombres de las columnas.
+        StringJoiner columnsJoiner = new StringJoiner(", ");
 
-        // Lista de campos a incluir en la consulta
-        StringBuilder camposConsulta = new StringBuilder();
-        // Lista de marcadores de parámetros (?) para valores
-        StringBuilder marcadoresValores = new StringBuilder();
+        // placeholders tendrá los signos de interrogación (?)
+        StringJoiner placeholders = new StringJoiner(", ");
 
-        // Construir las listas de campos y marcadores
-        for (String nombreCampo : nombresCampos) {
-            Object valorCampo = ObjectHelper.getter(objeto, nombreCampo);
-            // Solo incluir campos no nulos
-            if (valorCampo != null) {
-                if (!esPrimerCampo) {
-                    camposConsulta.append(", ");
-                    marcadoresValores.append(", ");
-                }
-                camposConsulta.append(nombreCampo);
-                marcadoresValores.append("?");
-                esPrimerCampo = false;
+        List<String> columnsList = new ArrayList<>();
+
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Ignore.class)) continue;
+
+            String columnName = field.getName();
+
+            if (field.isAnnotationPresent(Column.class)) {
+                columnName = field.getAnnotation(Column.class).name();
+            } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                columnName = field.getAnnotation(JoinColumn.class).name();
             }
+
+            columnsJoiner.add(columnName);
+            placeholders.add("?");
+            columnsList.add(columnName);
         }
 
-        // Completar la consulta SQL
-        consulta.append(camposConsulta)
-                .append(") VALUES (")
-                .append(marcadoresValores)
-                .append(")");
-
-        return consulta.toString();
+        // Ejemplo de salida:
+        //"INSERT INTO partida (id_partida, id_usuario, vidas, monedas) VALUES (?, ?, ?, ?)"
+        String sql = String.format("INSERT INTO %s (%s) VALUES (%s)", table, columnsJoiner, placeholders);
+        return new InsertQuery(sql, columnsList);
     }
 
-    /**
-     * Crea una consulta SQL SELECT para buscar un registro por su clave primaria.
-     *
-     * @param tipoClase La clase correspondiente a la tabla
-     * @param nombreClavePrimaria Nombre de la columna que es clave primaria
-     * @return Consulta SQL SELECT preparada
-     */
-    public static String createQuerySELECT(Class tipoClase, String nombreClavePrimaria) {
-        String nombreTabla = obtenerNombreTabla(tipoClase);
-        return "SELECT * FROM " + nombreTabla + " WHERE " + nombreClavePrimaria + " = ?";
+    public static String createSelectByIdQuery(Class<?> clazz) {
+        String table = getTableName(clazz);
+        String idColumn = ObjectHelper.getIdFieldName(clazz);
+
+        // SELECT * FROM partida WHERE id_partida = ?
+        return String.format("SELECT * FROM %s WHERE %s = ?", table, idColumn);
     }
 
-    /**
-     * Crea una consulta SQL SELECT para recuperar todos los registros de una tabla.
-     *
-     * @param tipoClase La clase correspondiente a la tabla
-     * @return Consulta SQL SELECT para todos los registros
-     */
-    public static String createQuerySELECTAll(Class tipoClase) {
-        String nombreTabla = obtenerNombreTabla(tipoClase);
-        return "SELECT * FROM " + nombreTabla;
+    // Devuelve query para obtener todas las filas sin filtro
+    public static String createSelectFindAll(Class<?> clazz) {
+        String table = getTableName(clazz);
+        return "SELECT * FROM " + table;
     }
 
-    /**
-     * Crea una consulta SQL SELECT con criterios de búsqueda.
-     *
-     * @param tipoClase La clase correspondiente a la tabla
-     * @param criteriosBusqueda Mapa con criterios de búsqueda (columna, valor)
-     * @return Consulta SQL SELECT con filtros
-     */
-    public static String createQuerySelectWithParams(Class tipoClase, HashMap<String, Object> criteriosBusqueda) {
-        String nombreTabla = obtenerNombreTabla(tipoClase);
+    // Devuelve query para obtener filas con filtro WHERE con parámetros
+    public static String createSelectFindAllWithParams(Class<?> clazz, Map<String, Object> params) {
+        String table = getTableName(clazz);
 
-        StringBuilder consulta = new StringBuilder("SELECT * FROM ")
-                .append(nombreTabla);
-
-        // Añadir criterios de búsqueda si existen
-        if (!criteriosBusqueda.isEmpty()) {
-            consulta.append(" WHERE ");
-            boolean esPrimerCriterio = true;
-
-            for (String nombreCampo : criteriosBusqueda.keySet()) {
-                if (!esPrimerCriterio) {
-                    consulta.append(" AND ");
-                }
-                consulta.append(nombreCampo).append(" = ?");
-                esPrimerCriterio = false;
-            }
+        if (params == null || params.isEmpty()) {
+            // Si no hay parámetros, devolvemos la consulta sin filtro
+            return createSelectFindAll(clazz);
         }
 
-        return consulta.toString();
-    }
-
-    /**
-     * Crea una consulta SQL UPDATE para modificar un registro.
-     *
-     * @param tipoClase La clase correspondiente a la tabla
-     * @param camposActualizar Mapa con los campos a actualizar
-     * @param nombreClavePrimaria Nombre de la columna que es clave primaria
-     * @param valorClavePrimaria Valor de la clave primaria para filtrar
-     * @return Consulta SQL UPDATE preparada
-     */
-    public static String createQueryUPDATE(Class tipoClase, HashMap<String, Object> camposActualizar,
-                                           String nombreClavePrimaria, Object valorClavePrimaria) {
-        String nombreTabla = obtenerNombreTabla(tipoClase);
-
-        StringBuilder consulta = new StringBuilder("UPDATE ")
-                .append(nombreTabla)
-                .append(" SET ");
-
-        boolean esPrimerCampo = true;
-        for (String nombreCampo : camposActualizar.keySet()) {
-            if (!esPrimerCampo) {
-                consulta.append(", ");
-            }
-            consulta.append(nombreCampo).append(" = ?");
-            esPrimerCampo = false;
+        StringJoiner whereClause = new StringJoiner(" AND ");
+        for (String column : params.keySet()) {
+            whereClause.add(column + " = ?");
         }
 
-        consulta.append(" WHERE ").append(nombreClavePrimaria).append(" = ?");
-
-        return consulta.toString();
+        return String.format("SELECT * FROM %s WHERE %s", table, whereClause);
     }
 
-    /**
-     * Crea una consulta SQL DELETE para eliminar un registro.
-     *
-     * @param tipoClase La clase correspondiente a la tabla
-     * @param nombreClavePrimaria Nombre de la columna que es clave primaria
-     * @return Consulta SQL DELETE preparada
-     */
-    public static String createQueryDELETE(Class tipoClase, String nombreClavePrimaria) {
-        String nombreTabla = obtenerNombreTabla(tipoClase);
-        return "DELETE FROM " + nombreTabla + " WHERE " + nombreClavePrimaria + " = ?";
+    public static String createDeleteByIdQuery(Class<?> clazz) {
+        String table = getTableName(clazz);
+        String idColumn = ObjectHelper.getIdFieldName(clazz);
+        return String.format("DELETE FROM %s WHERE %s = ?", table, idColumn);
     }
 
-    /**
-     * Obtiene el nombre de la tabla correspondiente a una clase.
-     * Por convención, usa el nombre de la clase.
-     *
-     * @param tipoClase La clase para la que se necesita el nombre de tabla
-     * @return Nombre de la tabla en la base de datos
-     */
-    private static String obtenerNombreTabla(Class tipoClase) {
-        // Se podría usar una anotación @Table, pero por simplicidad usamos el nombre de la clase
-        return tipoClase.getSimpleName();
+    public static String createUpdateQuery(Class<?> clazz) {
+        String table = getTableName(clazz);
+        String idColumn = ObjectHelper.getIdFieldName(clazz);
+
+        StringJoiner setClause = new StringJoiner(", ");
+
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Ignore.class)) continue;
+            if (field.isAnnotationPresent(Id.class)) continue;
+
+            String columnName = field.getName();
+
+            if (field.isAnnotationPresent(Column.class)) {
+                columnName = field.getAnnotation(Column.class).name();
+            } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                columnName = field.getAnnotation(JoinColumn.class).name();
+            }
+
+            setClause.add(columnName + " = ?");
+        }
+
+        // Ej UPDATE partida SET vidas = ?, monedas = ?, puntuacion = ? WHERE id_partida = ?
+        return String.format("UPDATE %s SET %s WHERE %s = ?", table, setClause, idColumn);
     }
 }

@@ -7,20 +7,20 @@ public class CategoriaObjeto {
 
     @Id
     @Column(name="id_categoria")
-    private int id_categoria;
+    private String id_categoria;
 
     @Column(name="nombre")
     private String nombre;
 
     public CategoriaObjeto() {}
 
-    public CategoriaObjeto(int id_categoria, String nombre) {
+    public CategoriaObjeto(String id_categoria, String nombre) {
         setId_categoria(id_categoria);
         setNombre(nombre);
     }
 
-    public int getId_categoria() {return id_categoria;}
-    public void setId_categoria(int id_categoria) {this.id_categoria = id_categoria;}
+    public String getId_categoria() {return id_categoria;}
+    public void setId_categoria(String id_categoria) {this.id_categoria = id_categoria;}
 
     public String getNombre() {return nombre;}
 

@@ -1,282 +1,239 @@
 package edu.upc.dsa.db.orm;
 
+import edu.upc.dsa.db.orm.util.InsertQuery;
 import edu.upc.dsa.db.orm.util.ObjectHelper;
 import edu.upc.dsa.db.orm.util.QueryHelper;
+import edu.upc.dsa.util.annotations.Column;
+import edu.upc.dsa.util.annotations.Id;
+import edu.upc.dsa.util.annotations.JoinColumn;
 import org.apache.log4j.Logger;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import edu.upc.dsa.util.annotations.Ignore;
 
-/**
- * Implementación de la interfaz Session que gestiona operaciones con la base de datos.
- * Esta clase convierte objetos Java en registros de base de datos y viceversa.
- */
+import java.lang.reflect.Field;
+import java.sql.*;
+import java.util.*;
+
 public class SessionImpl implements Session {
 
     final static Logger logger = Logger.getLogger(SessionImpl.class);
-    // Conexión a la base de datos
-    private final Connection conexion;
 
-    /**
-     * Constructor que recibe una conexión a la base de datos.
-     */
-    public SessionImpl(Connection conexion) {
-        this.conexion = conexion;
+    private final Connection conn;
+
+    public SessionImpl(Connection conn) {
+        this.conn = conn;
     }
 
-    /**
-     * Guarda un objeto en la base de datos.
-     */
     @Override
-    public void save(Object objeto) {
-        // Crear la consulta SQL INSERT basada en el objeto
-        String consultaInsert = QueryHelper.createQueryINSERT(objeto);
-        PreparedStatement statement = null;
+    public void save(Object entity) {
+        InsertQuery insertQuery = QueryHelper.createInsertQuery(entity.getClass());
+        logger.info("InsertQuery SQL: " + insertQuery.sql);
+        logger.info("InsertQuery columns: " + insertQuery.columns);
 
-        try {
-            // Preparar la consulta
-            statement = conexion.prepareStatement(consultaInsert);
-            // Obtener los campos del objeto
-            String[] nombresCampos = ObjectHelper.getFields(objeto);
-            int posicionParametro = 1;
+        try (PreparedStatement pstm = conn.prepareStatement(insertQuery.sql)) {
 
-            // Asignar los valores de cada campo como parámetros de la consulta
-            for (String nombreCampo : nombresCampos) {
-                Object valorCampo = ObjectHelper.getter(objeto, nombreCampo);
-                // Solo incluir campos no nulos
-                if (valorCampo != null) {
-                    statement.setObject(posicionParametro++, valorCampo);
+            Map<String, Object> columnValues = ObjectHelper.objectToMap(entity);
+            logger.info("MAP " + columnValues);
+
+            int i = 1;
+            for (String column : insertQuery.columns) {  // Orden garantizado
+                pstm.setObject(i++, columnValues.get(column));
+            }
+            logger.info("Sesion " + pstm);
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Object get(Class theClass, Object ID) {
+        String selectQuery = QueryHelper.createSelectByIdQuery(theClass);
+
+        try (PreparedStatement pstm = conn.prepareStatement(selectQuery)) {
+            pstm.setObject(1, ID);
+
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                Object entity = theClass.getDeclaredConstructor().newInstance();
+
+                // Por cada campo, rellenamos el objeto con los datos de la BD
+                for (Field field : theClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Ignore.class)) continue;
+
+                    String columnName = field.getName();
+
+                    if (field.isAnnotationPresent(Column.class)) {
+                        columnName = field.getAnnotation(Column.class).name();
+                    } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                        columnName = field.getAnnotation(JoinColumn.class).name();
+                    }
+
+                    Object value = rs.getObject(columnName);
+
+                    field.setAccessible(true);
+                    field.set(entity, value);
+                }
+                return entity;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Object> findAll(Class theClass) {
+        String query = QueryHelper.createSelectFindAll(theClass);
+        List<Object> results = new ArrayList<>();
+
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            ResultSet rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                Object entity = theClass.getDeclaredConstructor().newInstance();
+
+                for (Field field : theClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Ignore.class)) continue;
+
+                    String columnName = field.getName();
+
+                    if (field.isAnnotationPresent(Column.class)) {
+                        columnName = field.getAnnotation(Column.class).name();
+                    } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                        columnName = field.getAnnotation(JoinColumn.class).name();
+                    }
+
+                    Object value = rs.getObject(columnName);
+                    field.setAccessible(true);
+                    field.set(entity, value);
+                }
+
+                results.add(entity);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    @Override
+    public List<Object> findAll(Class theClass, HashMap<String, Object> params) {
+        String query = QueryHelper.createSelectFindAllWithParams(theClass, params);
+        List<Object> results = new ArrayList<>();
+
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            int i = 1;
+            if (params != null) {
+                for (Object value : params.values()) {
+                    pstm.setObject(i++, value);
                 }
             }
-            logger.info(statement);
 
-            // Ejecutar la consulta
-            statement.executeUpdate();
+            ResultSet rs = pstm.executeQuery();
 
-        } catch (SQLException e) {
-            System.out.println("Error al guardar objeto: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            // Cerrar recursos
-            try {
-                if (statement != null) statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            while (rs.next()) {
+                Object entity = theClass.getDeclaredConstructor().newInstance();
+
+                for (Field field : theClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Ignore.class)) continue;
+
+                    String columnName = field.getName();
+
+                    if (field.isAnnotationPresent(Column.class)) {
+                        columnName = field.getAnnotation(Column.class).name();
+                    } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                        columnName = field.getAnnotation(JoinColumn.class).name();
+                    }
+
+                    Object value = rs.getObject(columnName);
+                    field.setAccessible(true);
+                    field.set(entity, value);
+                }
+
+                results.add(entity);
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        return results;
     }
 
-    /**
-     * Busca un objeto por su clave primaria.
-     */
     @Override
-    public Object get(Class tipoClase, String nombreClavePrimaria, Object valorClavePrimaria) {
-        // Crear consulta SELECT con condición de clave primaria
-        String consultaSelect = QueryHelper.createQuerySELECT(tipoClase, nombreClavePrimaria);
-        ResultSet resultados = null;
-        PreparedStatement statement = null;
-        Object objetoEncontrado = null;
+    public void update(Object object) {
+        String updateQuery = QueryHelper.createUpdateQuery(object.getClass());
 
-        try {
-            // Preparar la consulta con el valor de la clave primaria
-            statement = conexion.prepareStatement(consultaSelect);
-            statement.setObject(1, valorClavePrimaria);
+        try (PreparedStatement pstm = conn.prepareStatement(updateQuery)) {
 
-            // Ejecutar la consulta
-            resultados = statement.executeQuery();
+            Map<String, Object> columnValues = ObjectHelper.objectToMap(object);
 
-            // Si encontramos un resultado, crear un objeto con esos datos
-            if (resultados.next()) {
-                // Crear una instancia vacía del tipo solicitado
-                objetoEncontrado = tipoClase.newInstance();
-                ResultSetMetaData metadatos = resultados.getMetaData();
+            // Obtenemos el nombre de la columna id para el WHERE
+            String idColumn = ObjectHelper.getIdFieldName(object.getClass());
+            Object idValue = null;
 
-                // Recorrer todas las columnas y asignar sus valores al objeto
-                for (int i = 1; i <= metadatos.getColumnCount(); i++) {
-                    String nombreColumna = metadatos.getColumnName(i);
-                    Object valorColumna = resultados.getObject(i);
-                    // Usar reflexión para asignar el valor al campo correspondiente
-                    ObjectHelper.setter(objetoEncontrado, nombreColumna, valorColumna);
+            // Guardamos el valor del id para el parámetro final
+            for (Field field : object.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Id.class)) {
+                    field.setAccessible(true);
+                    idValue = field.get(object);
+                    break;
                 }
             }
-        } catch (SQLException | InstantiationException | IllegalAccessException e) {
-            System.out.println("Error al buscar objeto: " + e.getMessage());
+
+            // Seteamos parámetros para SET (excluyendo el id)
+            int i = 1;
+            for (String col : columnValues.keySet()) {
+                if (!col.equals(idColumn)) {
+                    pstm.setObject(i++, columnValues.get(col));
+                }
+            }
+
+            // Parámetro WHERE id = ?
+            pstm.setObject(i, idValue);
+
+            pstm.executeUpdate();
+
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            // Cerrar recursos
-            try {
-                if (resultados != null) resultados.close();
-                if (statement != null) statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
-
-        return objetoEncontrado;
     }
 
-    /**
-     * Obtiene todos los objetos de una tabla.
-     */
     @Override
-    public List<Object> findAll(Class tipoClase) {
-        // Crear consulta SELECT para todos los registros
-        String consulta = QueryHelper.createQuerySELECTAll(tipoClase);
-        // Ejecutar la consulta sin criterios adicionales
-        return ejecutarConsultaYMapearResultados(tipoClase, consulta, new HashMap<>());
-    }
-
-    /**
-     * Busca objetos que cumplan con ciertos criterios.
-     */
-    @Override
-    public List<Object> findAll(Class tipoClase, HashMap<String, Object> criteriosBusqueda) {
-        // Crear consulta SELECT con los criterios de búsqueda
-        String consulta = QueryHelper.createQuerySelectWithParams(tipoClase, criteriosBusqueda);
-        // Ejecutar la consulta con los criterios proporcionados
-        return ejecutarConsultaYMapearResultados(tipoClase, consulta, criteriosBusqueda);
-    }
-
-    /**
-     * Actualiza un objeto en la base de datos.
-     */
-    @Override
-    public void update(Object objeto, String nombreClavePrimaria) {
-        // Recopilar los campos a actualizar
-        HashMap<String, Object> camposActualizar = new HashMap<>();
-        String[] nombresCampos = ObjectHelper.getFields(objeto);
-
-        // Crear un mapa con todos los campos excepto la clave primaria
-        for (String nombreCampo : nombresCampos) {
-            if (!nombreCampo.equals(nombreClavePrimaria)) {
-                Object valorCampo = ObjectHelper.getter(objeto, nombreCampo);
-                camposActualizar.put(nombreCampo, valorCampo);
-            }
-        }
-
-        // Obtener el valor de la clave primaria
-        Object valorClavePrimaria = ObjectHelper.getter(objeto, nombreClavePrimaria);
-
-        // Crear consulta UPDATE
-        String consultaUpdate = QueryHelper.createQueryUPDATE(objeto.getClass(), camposActualizar, nombreClavePrimaria, valorClavePrimaria);
-        PreparedStatement statement = null;
+    public void delete(Object object) {
+        String deleteQuery = QueryHelper.createDeleteByIdQuery(object.getClass());
+        Object idValue = null;
 
         try {
-            // Preparar la consulta
-            statement = conexion.prepareStatement(consultaUpdate);
-
-            // Asignar valores de los campos a actualizar
-            int posicionParametro = 1;
-            for (Object valor : camposActualizar.values()) {
-                statement.setObject(posicionParametro++, valor);
+            for (Field field : object.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Id.class)) {
+                    field.setAccessible(true);
+                    idValue = field.get(object);
+                    break;
+                }
             }
 
-            // Asignar valor de la clave primaria para la condición WHERE
-            statement.setObject(posicionParametro, valorClavePrimaria);
-
-            // Ejecutar la actualización
-            statement.executeUpdate();
-
-        } catch (SQLException e) {
-            System.out.println("Error al actualizar objeto: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            // Cerrar recursos
-            try {
-                if (statement != null) statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            try (PreparedStatement pstm = conn.prepareStatement(deleteQuery)) {
+                pstm.setObject(1, idValue);
+                pstm.executeUpdate();
             }
-        }
-    }
-
-    /**
-     * Elimina un objeto de la base de datos.
-     */
-    @Override
-    public void delete(Class tipoClase, String nombreClavePrimaria, Object valorClavePrimaria) {
-        // Crear consulta DELETE
-        String consultaDelete = QueryHelper.createQueryDELETE(tipoClase, nombreClavePrimaria);
-
-        try (PreparedStatement statement = conexion.prepareStatement(consultaDelete)) {
-            // Asignar el valor de la clave primaria
-            statement.setObject(1, valorClavePrimaria);
-            // Ejecutar la eliminación
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error al eliminar objeto: " + e.getMessage());
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * Cierra la sesión y libera los recursos.
-     */
     @Override
     public void close() {
         try {
-            if (conexion != null && !conexion.isClosed()) {
-                conexion.close();
-            }
+            if (conn != null && !conn.isClosed()) conn.close();
         } catch (SQLException e) {
-            System.out.println("Error al cerrar la conexión: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Método auxiliar para ejecutar consultas SELECT y mapear los resultados a objetos.
-     */
-    private List<Object> ejecutarConsultaYMapearResultados(Class tipoClase, String consulta, HashMap<String, Object> parametros) {
-        List<Object> listaResultados = new ArrayList<>();
-        PreparedStatement statement = null;
-        ResultSet resultados = null;
-
-        try {
-            // Preparar la consulta
-            statement = conexion.prepareStatement(consulta);
-
-            // Asignar los valores de los parámetros
-            int posicionParametro = 1;
-            for (Object valor : parametros.values()) {
-                statement.setObject(posicionParametro++, valor);
-            }
-
-            // Ejecutar la consulta
-            resultados = statement.executeQuery();
-            ResultSetMetaData metadatos = resultados.getMetaData();
-            int cantidadColumnas = metadatos.getColumnCount();
-
-            // Recorrer resultados y crear objetos
-            while (resultados.next()) {
-                // Crear nueva instancia para cada resultado
-                Object instancia = tipoClase.newInstance();
-
-                // Asignar valores de cada columna al objeto
-                for (int i = 1; i <= cantidadColumnas; i++) {
-                    String nombreColumna = metadatos.getColumnName(i);
-                    Object valorColumna = resultados.getObject(i);
-                    ObjectHelper.setter(instancia, nombreColumna, valorColumna);
-                }
-
-                // Añadir el objeto a la lista de resultados
-                listaResultados.add(instancia);
-            }
-        } catch (SQLException | InstantiationException | IllegalAccessException e) {
-            System.out.println("Error al ejecutar consulta: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            // Cerrar recursos
-            try {
-                if (resultados != null) resultados.close();
-                if (statement != null) statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return listaResultados;
     }
 }

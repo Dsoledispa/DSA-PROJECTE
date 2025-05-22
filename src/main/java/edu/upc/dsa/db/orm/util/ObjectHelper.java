@@ -3,67 +3,71 @@ package edu.upc.dsa.db.orm.util;
 
 import org.apache.log4j.Logger;
 
+import edu.upc.dsa.util.annotations.*;
+
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ObjectHelper {
-    // Este archivo literalmente son los getters y los setters de los modelos
-    // Pero para usar con la base de datos
 
-    final static Logger logger = Logger.getLogger(ObjectHelper.class);
+    // String es el nombre de la columna, object es el valor del campo en el objeto
+    public static Map<String, Object> objectToMap(Object obj) {
+        Map<String, Object> map = new HashMap<>();
 
-    // Este es para obtener los nombres de los atributos del objeto
-    public static String[] getFields(Object entity) {
+        // Recorre todos los atributos de una clase de models
+        // Usa reflexion (getDeclaredFields) para acceder incluso a campos private
+        for (Field field : obj.getClass().getDeclaredFields()) {
 
-        Class theClass = entity.getClass();
+            // Si el campo está anotado con @Ignore, no lo queremos persistir, así que se salta este campo.
+            if (field.isAnnotationPresent(Ignore.class)) continue;
 
-        Field[] fields = theClass.getDeclaredFields();
+            // Por defecto, se usa el nombre del campo como nombre de columna, por si no hay anotaciones
+            String columnName = field.getName();
 
-        String[] sFields = new String[fields.length];
-        int i=0;
+            // Si el campo tiene la anotación @Column, sobrescribimos el nombre de columna con el valor indicado en @Column(name = "...").
+            // Si no tiene @Column pero tiene @JoinColumn, usamos @JoinColumn(name = "...").
+            if (field.isAnnotationPresent(Column.class)) {
+                columnName = field.getAnnotation(Column.class).name();
+            } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                columnName = field.getAnnotation(JoinColumn.class).name();
+            }
 
-        for (Field f: fields) sFields[i++]=f.getName();
+            // Permite acceder al valor del campo aunque sea private.
+            field.setAccessible(true);
 
-        return sFields;
+            try {
+                // Intenta leer el valor real de ese campo en el objeto.
+                Object value = field.get(obj);
 
+                // Solo guarda en el mapa si el valor no es null (esto evita insertar columnas con null innecesariamente,
+                // aunque podrías quitar esta condición si quieres persistir también los null).
+                if (value != null) {
+                    map.put(columnName, value);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return map;
     }
 
+    // Recibe una clase (Class clazz), por ejemplo Partida.class.
+    // Devuelve un String, que será el nombre de la columna de la clave primaria (el campo con @Id).
+    public static String getIdFieldName(Class<?> clazz) {
 
-    //property es el atributo del objeto
-    public static void setter(Object object, String property, Object value) {
-        try {
-            // Obtenemos el tipo de atributo, ej string nombre
-            Field field = object.getClass().getDeclaredField(property);
-            Class fieldType = field.getType();
-
-            // Construimos el setter, ej setNombre
-            String methodName = "set" + property.substring(0, 1).toUpperCase() + property.substring(1);
-            // Obtenemos el setter
-            Method method = object.getClass().getMethod(methodName, fieldType);
-            // Ejecutamos el setter
-            method.invoke(object, value);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Recorre todos los atributos (campos) declarados en la clase clazz, incluyendo privados.
+        for (Field field : clazz.getDeclaredFields()) {
+            // Si el campo tiene la anotación @Id, significa que es la clave primaria.
+            if (field.isAnnotationPresent(Id.class)) {
+                // Si además tiene la anotación @Column, entonces se devuelve el nombre de columna definido en @Column(name = "...").
+                if (field.isAnnotationPresent(Column.class)) {
+                    return field.getAnnotation(Column.class).name();
+                }
+                return field.getName();
+            }
         }
-    }
-
-    //property es el atributo del objeto
-    public static Object getter(Object object, String property) {
-        try {
-            // Construimos el getter, ej getNombre
-            String methodName = "get" + property.substring(0, 1).toUpperCase() + property.substring(1);
-            // Obtenemos el getter
-            Method method = object.getClass().getMethod(methodName);
-            // Ejecutamos el getter
-            return method.invoke(object);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        throw new RuntimeException("No field annotated with @Id in class " + clazz.getSimpleName());
     }
 }

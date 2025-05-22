@@ -1,80 +1,70 @@
 package edu.upc.dsa.manager;
 
+import edu.upc.dsa.db.orm.dao.IUsuarioDAO;
+import edu.upc.dsa.db.orm.dao.UsuarioDAOImpl;
 import edu.upc.dsa.exceptions.usuario.PasswordNotMatchException;
 import edu.upc.dsa.exceptions.usuario.UsuarioNotFoundException;
 import edu.upc.dsa.exceptions.usuario.UsuarioYaExisteException;
-import edu.upc.dsa.models.*;
+import edu.upc.dsa.models.Usuario;
 import org.apache.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.LinkedList;
 import java.util.List;
 
-public class UsuarioManagerImpl implements UsuarioManager{
+public class UsuarioManagerImpl implements UsuarioManager {
 
-    private static UsuarioManager instance;
-    protected List<Usuario> usuarios;
+    private IUsuarioDAO usuarioDAO;
     final static Logger logger = Logger.getLogger(UsuarioManagerImpl.class);
 
-    private UsuarioManagerImpl() {
-        this.usuarios = new LinkedList<>();
-    }
-
-    // Patron singleton
-    public static UsuarioManager getInstance() {
-        if (instance == null) instance = new UsuarioManagerImpl();
-        return instance;
+    public UsuarioManagerImpl() {
+        this.usuarioDAO = new UsuarioDAOImpl();
     }
 
     @Override
     public Usuario addUsuario(Usuario u) throws UsuarioYaExisteException {
-        //logger.info("Nuevo usuario " + u);
         String nombreUsu = u.getNombreUsu();
-        Usuario comprobar = comprobarUsuario(nombreUsu);
-        if (comprobar != null){
+        Usuario comprobar = this.comprobarUsuario(nombreUsu);
+        if (comprobar != null) {
             logger.error("Usuario con " + nombreUsu + " ya existe");
             throw new UsuarioYaExisteException("Usuario con " + nombreUsu + " ya existe");
         }
 
-        // Cifrado de la contraseña
+        // Cifrar la contraseña
         String hashedPassword = BCrypt.hashpw(u.getPassword(), BCrypt.gensalt());
         u.setPassword(hashedPassword);
-
-        this.usuarios.add(u);
-        //logger.info("Usuario añadido: " + u);
-        logger.info("Usuarios: " +this.usuarios);
+        logger.info("Que esta pasando"+u);
+        int result = usuarioDAO.addUsuario(u.getNombreUsu(), u.getPassword());
+        if (result != 1) {
+            logger.error("Error al añadir usuario: " + u);
+            // Podrías lanzar excepción aquí si quieres:
+            // throw new RuntimeException("Error al insertar usuario en BD");
+            return null;
+        }
+        logger.info("Usuario añadido: " + u);
         return u;
     }
 
     @Override
-    public Usuario addUsuario(String nombreUsu, String password) {
+    public Usuario addUsuario(String nombreUsu, String password) throws UsuarioYaExisteException {
         return this.addUsuario(new Usuario(nombreUsu, password));
     }
 
     @Override
     public Usuario comprobarUsuario(String nombreUsu) {
-        //logger.info("getUsuario("+ nombreUsu +")");
-        for (Usuario u: this.usuarios) {
-            if (u.getNombreUsu().equals(nombreUsu)) {
-                logger.info("getUsuario("+ nombreUsu +"): "+u);
-                return u;
-            }
-        }
-        //logger.info(nombreUsu+ " no encontrado ");
-        return null;
+        return usuarioDAO.getUsuario(nombreUsu);
     }
 
     @Override
     public Usuario getUsuario(String nombreUsu) throws UsuarioNotFoundException {
-        Usuario u = comprobarUsuario(nombreUsu);
+        Usuario u = usuarioDAO.getUsuario(nombreUsu);
         if (u == null) throw new UsuarioNotFoundException(nombreUsu + " no encontrado");
         return u;
     }
 
     @Override
-    public Usuario loginUsuario(String nombreUsu, String password) throws PasswordNotMatchException {
+    public Usuario loginUsuario(String nombreUsu, String password) throws PasswordNotMatchException, UsuarioNotFoundException {
         Usuario u = getUsuario(nombreUsu);
-        if (u == null || !BCrypt.checkpw(password, u.getPassword())) {
+        if (!BCrypt.checkpw(password, u.getPassword())) {
             throw new PasswordNotMatchException("Credenciales incorrectas");
         }
         logger.info("Login exitoso para: " + nombreUsu);
@@ -82,18 +72,25 @@ public class UsuarioManagerImpl implements UsuarioManager{
     }
 
     @Override
+    public void deleteUsuario(String nombreUsu) throws UsuarioNotFoundException {
+        Usuario u = usuarioDAO.getUsuario(nombreUsu);
+        if (u == null) {
+            logger.error("No se puede borrar usuario, no encontrado: " + nombreUsu);
+            throw new UsuarioNotFoundException(nombreUsu + " no encontrado");
+        }
+        usuarioDAO.deleteUsuario(nombreUsu);
+        logger.info("Usuario borrado: " + nombreUsu);
+    }
+
+    @Override
     public List<Usuario> getAllUsuarios() {
-        return this.usuarios;
+        List<Usuario> usuarios = usuarioDAO.getUsuarios();
+        logger.info("getAllUsuarios: " + usuarios);
+        return usuarios;
     }
 
     @Override
     public int sizeUsuarios() {
-        return this.usuarios.size();
+        return getAllUsuarios().size();
     }
-
-    @Override
-    public void clear() {
-        this.usuarios.clear();
-    }
-
 }

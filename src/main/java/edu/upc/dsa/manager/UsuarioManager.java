@@ -10,18 +10,19 @@ import java.util.List;
 public interface UsuarioManager {
 
     // Registrar usuario
-    Usuario addUsuario(Usuario u) throws UsuarioYaExisteException;
+    Usuario addUsuario(Usuario u);
     Usuario addUsuario(String nombreUsu, String password);
     Usuario comprobarUsuario(String nombreUsu);
     // Registrar usuario
     // Login
-    Usuario getUsuario(String nombreUsu) throws UsuarioNotFoundException;
-    Usuario loginUsuario(String nombreUsu, String password) throws PasswordNotMatchException;
+    Usuario getUsuario(String nombreUsu);
+    Usuario loginUsuario(String nombreUsu, String password);
     // Login
+
+    void deleteUsuario(String nombreUsu);
 
     List<Usuario> getAllUsuarios();
 
-    void clear();
     int sizeUsuarios();
 
 }
