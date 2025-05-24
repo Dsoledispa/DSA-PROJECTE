@@ -1,7 +1,5 @@
 package edu.upc.dsa.db.orm.util;
 
-import org.apache.log4j.Logger;
-
 import edu.upc.dsa.util.annotations.*;
 
 import java.lang.reflect.Field;
@@ -24,7 +22,7 @@ public class QueryHelper {
     }
 
     // Recibe como parámetro la clase del modelo (clazz) de la que se quiere generar la consulta SQL de inserción.
-    public static InsertQuery createInsertQuery(Class<?> clazz) {
+    public static PreparedQuery createInsertQuery(Class<?> clazz) {
         String table = getTableName(clazz);
 
         // columns guardará los nombres de las columnas.
@@ -54,7 +52,7 @@ public class QueryHelper {
         // Ejemplo de salida:
         //"INSERT INTO partida (id_partida, id_usuario, vidas, monedas) VALUES (?, ?, ?, ?)"
         String sql = String.format("INSERT INTO %s (%s) VALUES (%s)", table, columnsJoiner, placeholders);
-        return new InsertQuery(sql, columnsList);
+        return new PreparedQuery(sql, columnsList);
     }
 
     public static String createSelectByIdQuery(Class<?> clazz) {
@@ -66,26 +64,27 @@ public class QueryHelper {
     }
 
     // Devuelve query para obtener todas las filas sin filtro
-    public static String createSelectFindAll(Class<?> clazz) {
+    public static PreparedQuery createSelectFindAll(Class<?> clazz) {
         String table = getTableName(clazz);
-        return "SELECT * FROM " + table;
+        String sql = "SELECT * FROM " + table;
+        return new PreparedQuery(sql, new ArrayList<>());  // lista vacía y mutable
     }
 
     // Devuelve query para obtener filas con filtro WHERE con parámetros
-    public static String createSelectFindAllWithParams(Class<?> clazz, Map<String, Object> params) {
+    public static PreparedQuery createSelectFindAllWithParams(Class<?> clazz, Map<String, Object> params) {
         String table = getTableName(clazz);
-
         if (params == null || params.isEmpty()) {
-            // Si no hay parámetros, devolvemos la consulta sin filtro
             return createSelectFindAll(clazz);
         }
 
+        List<String> orderedKeys = new ArrayList<>(params.keySet());  // garantiza orden
         StringJoiner whereClause = new StringJoiner(" AND ");
-        for (String column : params.keySet()) {
+        for (String column : orderedKeys) {
             whereClause.add(column + " = ?");
         }
 
-        return String.format("SELECT * FROM %s WHERE %s", table, whereClause);
+        String sql = String.format("SELECT * FROM %s WHERE %s", table, whereClause);
+        return new PreparedQuery(sql, orderedKeys);
     }
 
     public static String createDeleteByIdQuery(Class<?> clazz) {
@@ -94,11 +93,12 @@ public class QueryHelper {
         return String.format("DELETE FROM %s WHERE %s = ?", table, idColumn);
     }
 
-    public static String createUpdateQuery(Class<?> clazz) {
+    public static PreparedQuery createUpdateQuery(Class<?> clazz) {
         String table = getTableName(clazz);
         String idColumn = ObjectHelper.getIdFieldName(clazz);
 
         StringJoiner setClause = new StringJoiner(", ");
+        List<String> columnsList = new ArrayList<>();
 
         for (Field field : clazz.getDeclaredFields()) {
             if (field.isAnnotationPresent(Ignore.class)) continue;
@@ -113,9 +113,10 @@ public class QueryHelper {
             }
 
             setClause.add(columnName + " = ?");
+            columnsList.add(columnName);
         }
 
-        // Ej UPDATE partida SET vidas = ?, monedas = ?, puntuacion = ? WHERE id_partida = ?
-        return String.format("UPDATE %s SET %s WHERE %s = ?", table, setClause, idColumn);
+        String sql = String.format("UPDATE %s SET %s WHERE %s = ?", table, setClause, idColumn);
+        return new PreparedQuery(sql, columnsList);
     }
 }

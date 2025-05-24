@@ -1,6 +1,6 @@
 package edu.upc.dsa.db.orm;
 
-import edu.upc.dsa.db.orm.util.InsertQuery;
+import edu.upc.dsa.db.orm.util.PreparedQuery;
 import edu.upc.dsa.db.orm.util.ObjectHelper;
 import edu.upc.dsa.db.orm.util.QueryHelper;
 import edu.upc.dsa.util.annotations.Column;
@@ -26,17 +26,16 @@ public class SessionImpl implements Session {
 
     @Override
     public void save(Object entity) {
-        InsertQuery insertQuery = QueryHelper.createInsertQuery(entity.getClass());
-        logger.info("InsertQuery SQL: " + insertQuery.sql);
-        logger.info("InsertQuery columns: " + insertQuery.columns);
+        PreparedQuery preparedQuery = QueryHelper.createInsertQuery(entity.getClass());
+        logger.info("InsertQuery SQL: " + preparedQuery.sql);
+        logger.info("InsertQuery columns: " + preparedQuery.columns);
 
-        try (PreparedStatement pstm = conn.prepareStatement(insertQuery.sql)) {
-
+        try (PreparedStatement pstm = conn.prepareStatement(preparedQuery.sql)){
             Map<String, Object> columnValues = ObjectHelper.objectToMap(entity);
             logger.info("MAP " + columnValues);
 
             int i = 1;
-            for (String column : insertQuery.columns) {  // Orden garantizado
+            for (String column : preparedQuery.columns) {  // Orden garantizado
                 pstm.setObject(i++, columnValues.get(column));
             }
             logger.info("Sesion " + pstm);
@@ -87,7 +86,8 @@ public class SessionImpl implements Session {
 
     @Override
     public List<Object> findAll(Class theClass) {
-        String query = QueryHelper.createSelectFindAll(theClass);
+        PreparedQuery queryObj = QueryHelper.createSelectFindAll(theClass);
+        String query = queryObj.sql;
         List<Object> results = new ArrayList<>();
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
@@ -124,15 +124,15 @@ public class SessionImpl implements Session {
 
     @Override
     public List<Object> findAll(Class theClass, HashMap<String, Object> params) {
-        String query = QueryHelper.createSelectFindAllWithParams(theClass, params);
+        PreparedQuery queryObj = QueryHelper.createSelectFindAllWithParams(theClass, params);
+        String query = queryObj.sql;
+        List<String> orderedKeys = queryObj.columns;
         List<Object> results = new ArrayList<>();
 
         try (PreparedStatement pstm = conn.prepareStatement(query)) {
             int i = 1;
-            if (params != null) {
-                for (Object value : params.values()) {
-                    pstm.setObject(i++, value);
-                }
+            for (String key : orderedKeys) {
+                pstm.setObject(i++, params.get(key));
             }
 
             ResultSet rs = pstm.executeQuery();
@@ -167,40 +167,26 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public void update(Object object) {
-        String updateQuery = QueryHelper.createUpdateQuery(object.getClass());
+    public void update(Object entity) {
+        PreparedQuery preparedQuery = QueryHelper.createUpdateQuery(entity.getClass());
+        Map<String, Object> columnValues = ObjectHelper.objectToMap(entity);
 
-        try (PreparedStatement pstm = conn.prepareStatement(updateQuery)) {
 
-            Map<String, Object> columnValues = ObjectHelper.objectToMap(object);
-
-            // Obtenemos el nombre de la columna id para el WHERE
-            String idColumn = ObjectHelper.getIdFieldName(object.getClass());
-            Object idValue = null;
-
-            // Guardamos el valor del id para el parámetro final
-            for (Field field : object.getClass().getDeclaredFields()) {
-                if (field.isAnnotationPresent(Id.class)) {
-                    field.setAccessible(true);
-                    idValue = field.get(object);
-                    break;
-                }
-            }
-
-            // Seteamos parámetros para SET (excluyendo el id)
+        try (PreparedStatement pstm = conn.prepareStatement(preparedQuery.sql)) {
             int i = 1;
-            for (String col : columnValues.keySet()) {
-                if (!col.equals(idColumn)) {
-                    pstm.setObject(i++, columnValues.get(col));
-                }
+            for (String column : preparedQuery.columns) {
+                pstm.setObject(i++, columnValues.get(column));
             }
 
-            // Parámetro WHERE id = ?
-            pstm.setObject(i, idValue);
+            // Seteas el valor del ID al final
+            String idColumn = ObjectHelper.getIdFieldName(entity.getClass());
+            Field idField = entity.getClass().getDeclaredField(idColumn);
+            idField.setAccessible(true);
+            pstm.setObject(i, idField.get(entity));
 
             pstm.executeUpdate();
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }

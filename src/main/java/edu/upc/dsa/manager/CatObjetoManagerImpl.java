@@ -58,6 +58,27 @@ public class CatObjetoManagerImpl implements CatObjetoManager {
         return this.addCatObjeto(new CategoriaObjeto(id_categoria, nombre));
     }
 
+    public void updateCatObjeto(String id_categoria, String nuevoNombre) {
+        CategoriaObjeto categoria = catObjetoDAO.getCategoriaObjeto(id_categoria);
+
+        if (categoria == null) {
+            logger.warn("No se encontró la categoría con id='" + id_categoria + "' para actualizar");
+            return;
+        }
+
+        // Verificamos que no haya otra categoría con el mismo nombre
+        boolean yaExiste = catObjetoDAO.getCategoriasObjeto().stream()
+                .anyMatch(c -> !c.getId_categoria().equals(id_categoria) && c.getNombre().equalsIgnoreCase(nuevoNombre));
+
+        if (yaExiste) {
+            logger.warn("Ya existe otra categoría con nombre='" + nuevoNombre + "', no se puede actualizar");
+            throw new CatObjetoYaExisteException(nuevoNombre);
+        }
+
+        catObjetoDAO.updateCategoriaObjeto(id_categoria, nuevoNombre);
+        logger.info("updateCatObjeto: categoría con id='" + id_categoria + "' actualizada a nombre='" + nuevoNombre + "'");
+    }
+
     @Override
     public void deleteCatObjeto(String id_categoria) {
         catObjetoDAO.deleteCategoriaObjeto(id_categoria);

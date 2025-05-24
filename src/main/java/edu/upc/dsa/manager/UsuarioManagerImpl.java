@@ -21,7 +21,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
     }
 
     @Override
-    public Usuario addUsuario(Usuario u) throws UsuarioYaExisteException {
+    public Usuario addUsuario(Usuario u) {
         String nombreUsu = u.getNombreUsu();
         Usuario comprobar = this.comprobarUsuario(nombreUsu);
         if (comprobar != null) {
@@ -45,7 +45,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
     }
 
     @Override
-    public Usuario addUsuario(String nombreUsu, String password) throws UsuarioYaExisteException {
+    public Usuario addUsuario(String nombreUsu, String password) {
         return this.addUsuario(new Usuario(nombreUsu, password));
     }
 
@@ -55,14 +55,14 @@ public class UsuarioManagerImpl implements UsuarioManager {
     }
 
     @Override
-    public Usuario getUsuario(String nombreUsu) throws UsuarioNotFoundException {
+    public Usuario getUsuario(String nombreUsu){
         Usuario u = usuarioDAO.getUsuario(nombreUsu);
         if (u == null) throw new UsuarioNotFoundException(nombreUsu + " no encontrado");
         return u;
     }
 
     @Override
-    public Usuario loginUsuario(String nombreUsu, String password) throws PasswordNotMatchException, UsuarioNotFoundException {
+    public Usuario loginUsuario(String nombreUsu, String password){
         Usuario u = getUsuario(nombreUsu);
         if (!BCrypt.checkpw(password, u.getPassword())) {
             throw new PasswordNotMatchException("Credenciales incorrectas");
@@ -72,7 +72,23 @@ public class UsuarioManagerImpl implements UsuarioManager {
     }
 
     @Override
-    public void deleteUsuario(String nombreUsu) throws UsuarioNotFoundException {
+    public void updateUsuario(String nombreUsu, String nuevoPassword){
+        Usuario u = usuarioDAO.getUsuario(nombreUsu);
+        if (u == null) {
+            logger.error("No se puede actualizar usuario, no encontrado: " + nombreUsu);
+            throw new UsuarioNotFoundException(nombreUsu + " no encontrado");
+        }
+
+        // Cifrar nueva contraseña
+        String hashedPassword = BCrypt.hashpw(nuevoPassword, BCrypt.gensalt());
+
+        // Actualizar en base de datos
+        usuarioDAO.updateUsuario(nombreUsu, hashedPassword);
+        logger.info("Contraseña actualizada para usuario: " + nombreUsu);
+    }
+
+    @Override
+    public void deleteUsuario(String nombreUsu){
         Usuario u = usuarioDAO.getUsuario(nombreUsu);
         if (u == null) {
             logger.error("No se puede borrar usuario, no encontrado: " + nombreUsu);
