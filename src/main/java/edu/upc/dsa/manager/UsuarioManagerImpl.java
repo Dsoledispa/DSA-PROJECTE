@@ -1,6 +1,6 @@
 package edu.upc.dsa.manager;
 
-import edu.upc.dsa.db.orm.dao.IUsuarioDAO;
+import edu.upc.dsa.db.orm.dao.UsuarioDAO;
 import edu.upc.dsa.db.orm.dao.UsuarioDAOImpl;
 import edu.upc.dsa.exceptions.usuario.PasswordNotMatchException;
 import edu.upc.dsa.exceptions.usuario.UsuarioNotFoundException;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class UsuarioManagerImpl implements UsuarioManager {
 
-    private IUsuarioDAO usuarioDAO;
+    private UsuarioDAO usuarioDAO;
     final static Logger logger = Logger.getLogger(UsuarioManagerImpl.class);
 
     public UsuarioManagerImpl() {

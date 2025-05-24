@@ -2,8 +2,8 @@ package edu.upc.dsa.DAOTest;
 
 import edu.upc.dsa.db.orm.FactorySession;
 import edu.upc.dsa.db.orm.Session;
-import edu.upc.dsa.db.orm.dao.ICatObjetoDAO;
-import edu.upc.dsa.db.orm.dao.ICatObjetoDAOImpl;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAO;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAOImpl;
 import edu.upc.dsa.models.CategoriaObjeto;
 import org.junit.After;
 import org.junit.Before;
@@ -13,15 +13,15 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ICatObjetoDAOImplTest {
+public class CatObjetoDAOImplTest {
 
-    private ICatObjetoDAO dao;
+    private CatObjetoDAO dao;
     private Session session;
     private final String TEST_ID = "test_categoria";  // ID único para tests
 
     @Before
     public void setUp() {
-        dao = new ICatObjetoDAOImpl();
+        dao = new CatObjetoDAOImpl();
 
         // Borramos si ya existe la categoría con TEST_ID, para dejar limpio antes de testear
         session = FactorySession.openSession();

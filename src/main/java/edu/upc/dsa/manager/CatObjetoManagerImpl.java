@@ -1,12 +1,11 @@
 package edu.upc.dsa.manager;
 
-import edu.upc.dsa.db.orm.dao.ICatObjetoDAO;
-import edu.upc.dsa.db.orm.dao.ICatObjetoDAOImpl;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAO;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAOImpl;
 import edu.upc.dsa.exceptions.categoriaObjeto.CatObjetoYaExisteException;
 import edu.upc.dsa.models.CategoriaObjeto;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -14,10 +13,10 @@ public class CatObjetoManagerImpl implements CatObjetoManager {
 
     final static Logger logger = Logger.getLogger(CatObjetoManagerImpl.class);
 
-    private ICatObjetoDAO catObjetoDAO;
+    private CatObjetoDAO catObjetoDAO;
 
     public CatObjetoManagerImpl() {
-        this.catObjetoDAO = new ICatObjetoDAOImpl(); // o puedes inyectarlo si deseas
+        this.catObjetoDAO = new CatObjetoDAOImpl(); // o puedes inyectarlo si deseas
     }
 
     @Override
