@@ -1,12 +1,11 @@
 package edu.upc.dsa.manager;
 
-import edu.upc.dsa.db.orm.dao.ICatObjetoDAO;
-import edu.upc.dsa.db.orm.dao.ICatObjetoDAOImpl;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAO;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAOImpl;
 import edu.upc.dsa.exceptions.categoriaObjeto.CatObjetoYaExisteException;
 import edu.upc.dsa.models.CategoriaObjeto;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -14,10 +13,10 @@ public class CatObjetoManagerImpl implements CatObjetoManager {
 
     final static Logger logger = Logger.getLogger(CatObjetoManagerImpl.class);
 
-    private ICatObjetoDAO catObjetoDAO;
+    private CatObjetoDAO catObjetoDAO;
 
     public CatObjetoManagerImpl() {
-        this.catObjetoDAO = new ICatObjetoDAOImpl(); // o puedes inyectarlo si deseas
+        this.catObjetoDAO = new CatObjetoDAOImpl(); // o puedes inyectarlo si deseas
     }
 
     @Override
@@ -57,6 +56,27 @@ public class CatObjetoManagerImpl implements CatObjetoManager {
     @Override
     public CategoriaObjeto addCatObjeto(String id_categoria, String nombre) {
         return this.addCatObjeto(new CategoriaObjeto(id_categoria, nombre));
+    }
+
+    public void updateCatObjeto(String id_categoria, String nuevoNombre) {
+        CategoriaObjeto categoria = catObjetoDAO.getCategoriaObjeto(id_categoria);
+
+        if (categoria == null) {
+            logger.warn("No se encontró la categoría con id='" + id_categoria + "' para actualizar");
+            return;
+        }
+
+        // Verificamos que no haya otra categoría con el mismo nombre
+        boolean yaExiste = catObjetoDAO.getCategoriasObjeto().stream()
+                .anyMatch(c -> !c.getId_categoria().equals(id_categoria) && c.getNombre().equalsIgnoreCase(nuevoNombre));
+
+        if (yaExiste) {
+            logger.warn("Ya existe otra categoría con nombre='" + nuevoNombre + "', no se puede actualizar");
+            throw new CatObjetoYaExisteException(nuevoNombre);
+        }
+
+        catObjetoDAO.updateCategoriaObjeto(id_categoria, nuevoNombre);
+        logger.info("updateCatObjeto: categoría con id='" + id_categoria + "' actualizada a nombre='" + nuevoNombre + "'");
     }
 
     @Override

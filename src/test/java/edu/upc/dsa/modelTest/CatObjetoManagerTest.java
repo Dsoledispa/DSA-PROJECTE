@@ -53,6 +53,31 @@ public class CatObjetoManagerTest {
         assertThrows(CatObjetoYaExisteException.class, () -> {
             this.com.addCatObjeto("otraID", "armas"); // ya existe como "ARMAS"
         });
+        this.com.deleteCatObjeto(id);
+        assertNull(this.com.getCatObjeto(id));
+    }
+
+    @Test
+    public void testUpdateCatObjeto() {
+        String id = "101";
+        String nombreOriginal = "CONSUMIBLES";
+        String nuevoNombre = "HECHIZOS";
+
+        // Asegurarse de que existe
+        CategoriaObjeto existente = this.com.getCatObjeto(id);
+        if (existente == null) {
+            this.com.addCatObjeto(id, nombreOriginal);
+        }
+
+        // Actualizar el nombre
+        this.com.updateCatObjeto(id, nuevoNombre);
+
+        CategoriaObjeto actualizada = this.com.getCatObjeto(id);
+        assertNotNull(actualizada);
+        assertEquals(nuevoNombre, actualizada.getNombre());
+
+        this.com.deleteCatObjeto(id);
+        assertNull(this.com.getCatObjeto(id));
     }
 
     @Test

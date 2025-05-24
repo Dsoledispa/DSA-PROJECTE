@@ -5,10 +5,9 @@ import edu.upc.dsa.db.orm.Session;
 import edu.upc.dsa.models.CategoriaObjeto;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class ICatObjetoDAOImpl implements ICatObjetoDAO {
+public class CatObjetoDAOImpl implements CatObjetoDAO {
 
     @Override
     public int addCategoriaObjeto(String id_categoria, String nombre) {

@@ -17,6 +17,9 @@ public interface CatObjetoManager {
     CategoriaObjeto addCatObjeto(CategoriaObjeto categoria);
     CategoriaObjeto addCatObjeto(String id_categoria, String nombre);
 
+    // Actualiza el nombre de una categoría por su ID
+    void updateCatObjeto(String id_categoria, String nuevoNombre);
+
     // Elimina una categoría por su ID
     void deleteCatObjeto(String id_categoria);
 

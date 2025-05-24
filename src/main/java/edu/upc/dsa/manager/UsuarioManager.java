@@ -19,6 +19,8 @@ public interface UsuarioManager {
     Usuario loginUsuario(String nombreUsu, String password);
     // Login
 
+    void updateUsuario(String nombreUsu, String nuevoPassword);
+
     void deleteUsuario(String nombreUsu);
 
     List<Usuario> getAllUsuarios();

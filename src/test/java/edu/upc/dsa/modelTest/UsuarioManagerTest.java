@@ -25,7 +25,7 @@ public class UsuarioManagerTest {
     }
 
     @Test
-    public void addUsuarioTest() throws UsuarioYaExisteException {
+    public void addUsuarioTest(){
         List<Usuario> usuariosAntes = um.getAllUsuarios();
         int sizeAntes = usuariosAntes.size();
 
@@ -47,16 +47,16 @@ public class UsuarioManagerTest {
     }
 
     @Test
-    public void getUsuarioTest() throws UsuarioNotFoundException, UsuarioYaExisteException {
+    public void getUsuarioTest(){
         try {
             try {
-                this.um.getUsuario("Paco");
+                this.um.getUsuario("Alonso");
             } catch (UsuarioNotFoundException e) {
-                this.um.addUsuario("Paco", "1234");
+                this.um.addUsuario("Alonso", "1234");
             }
-            Usuario u = this.um.getUsuario("Paco");
+            Usuario u = this.um.getUsuario("Alonso");
 
-            assertEquals("Paco", u.getNombreUsu());
+            assertEquals("Alonso", u.getNombreUsu());
             assertNotNull(u.getPassword());
             assertNotEquals("1234", u.getPassword());  // debe estar cifrada
 
@@ -66,34 +66,96 @@ public class UsuarioManagerTest {
             );
         } finally {
             try {
-                this.um.deleteUsuario("Paco");
+                this.um.deleteUsuario("Alonso");
             } catch (UsuarioNotFoundException ignored) {}
         }
     }
 
     @Test
-    public void loginUsuarioTest() throws UsuarioYaExisteException, PasswordNotMatchException, UsuarioNotFoundException {
+    public void loginUsuarioTest() {
         try {
             try {
-                this.um.addUsuario("Paco", "1234");
+                this.um.addUsuario("Alonso", "1234");
             } catch (UsuarioYaExisteException ignored) {}
 
-            Usuario u = this.um.loginUsuario("Paco", "1234");
-            assertEquals("Paco", u.getNombreUsu());
+
+            Usuario u = this.um.loginUsuario("Alonso", "1234");
+            assertEquals("Alonso", u.getNombreUsu());
 
             // Login con contraseña incorrecta
             assertThrows(PasswordNotMatchException.class, () ->
-                    this.um.loginUsuario("Paco", "claveIncorrecta")
+                    this.um.loginUsuario("Alonso", "claveIncorrecta")
             );
 
             // Login con usuario no existente
             assertThrows(UsuarioNotFoundException.class, () ->
                     this.um.loginUsuario("NoExiste", "1234")
             );
+
+        } catch (Exception e) {
+            fail("Excepción inesperada: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void updateUsuarioTest(){
+        String nombreUsu = "Luis";
+        String oldPass = "pass1";
+        String newPass = "pass2";
+
+        try {
+            // Crear usuario si no existe
+            try {
+                um.getUsuario(nombreUsu);
+            } catch (UsuarioNotFoundException e) {
+                um.addUsuario(nombreUsu, oldPass);
+            }
+
+            // Login con la contraseña antigua debe funcionar
+            Usuario u = um.loginUsuario(nombreUsu, oldPass);
+            assertEquals(nombreUsu, u.getNombreUsu());
+
+            // Actualizar contraseña
+            um.updateUsuario(nombreUsu, newPass);
+
+            // Login con antigua debe fallar
+            assertThrows(PasswordNotMatchException.class, () -> {
+                um.loginUsuario(nombreUsu, oldPass);
+            });
+
+            // Login con nueva debe funcionar
+            Usuario u2 = um.loginUsuario(nombreUsu, newPass);
+            assertEquals(nombreUsu, u2.getNombreUsu());
+
         } finally {
             try {
-                this.um.deleteUsuario("Paco");
+                um.deleteUsuario(nombreUsu);
             } catch (UsuarioNotFoundException ignored) {}
+        }
+    }
+
+    @Test
+    public void deleteUsuarioTest() throws UsuarioYaExisteException {
+        String nombreUsu = "Carlos";
+        String password = "deleteTest";
+
+        try {
+            um.addUsuario(nombreUsu, password);
+
+            // Confirmamos que el usuario fue creado
+            Usuario u = um.getUsuario(nombreUsu);
+            assertEquals(nombreUsu, u.getNombreUsu());
+
+            // Eliminar usuario
+            um.deleteUsuario(nombreUsu);
+
+            // Verificar que el usuario ya no existe
+            assertThrows(UsuarioNotFoundException.class, () -> {
+                um.getUsuario(nombreUsu);
+            });
+
+        } catch (UsuarioNotFoundException e) {
+            fail("El usuario debería existir antes de ser eliminado");
         }
     }
 }

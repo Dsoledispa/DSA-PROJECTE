@@ -49,7 +49,7 @@ CREATE TABLE inventario (
 );
 
 -- Insertar categorías iniciales (con IDs definidos manualmente)
-INSERT INTO categoria_objeto (id_categoria, nombre) VALUES 
+INSERT INTO categoria_objeto (id_categoria, nombre) VALUES
 ('1', 'ARMAS'),
 ('2', 'ARMADURAS'),
 ('3', 'POCIONES');
@@ -68,3 +68,4 @@ INSERT INTO objeto (id_objeto, nombre, precio, imagen, descripcion, id_categoria
 ('3', 'Poción', 20, '/img/pocion.png', 'Una pocion', '3');
 
 -- Nota: Las partidas e inventario se insertan desde la aplicación
+

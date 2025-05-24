@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuarioDAOImpl implements IUsuarioDAO {
+public class UsuarioDAOImpl implements UsuarioDAO {
 
     final static Logger logger = Logger.getLogger(UsuarioDAOImpl.class);
 

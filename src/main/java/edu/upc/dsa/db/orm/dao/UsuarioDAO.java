@@ -4,7 +4,7 @@ import edu.upc.dsa.models.Usuario;
 
 import java.util.List;
 
-public interface IUsuarioDAO {
+public interface UsuarioDAO {
     // Añade un usuario y devuelve un entero (podríamos usar 1 para éxito o 0 para fallo,
     // ya que no tienes id numérico)
     int addUsuario(String nombreUsu, String password);
