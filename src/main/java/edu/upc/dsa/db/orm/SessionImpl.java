@@ -52,18 +52,15 @@ public class SessionImpl implements Session {
 
         try (PreparedStatement pstm = conn.prepareStatement(selectQuery)) {
             pstm.setObject(1, ID);
-
             ResultSet rs = pstm.executeQuery();
 
             if (rs.next()) {
                 Object entity = theClass.getDeclaredConstructor().newInstance();
 
-                // Por cada campo, rellenamos el objeto con los datos de la BD
                 for (Field field : theClass.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Ignore.class)) continue;
 
                     String columnName = field.getName();
-
                     if (field.isAnnotationPresent(Column.class)) {
                         columnName = field.getAnnotation(Column.class).name();
                     } else if (field.isAnnotationPresent(JoinColumn.class)) {
@@ -71,18 +68,33 @@ public class SessionImpl implements Session {
                     }
 
                     Object value = rs.getObject(columnName);
-
                     field.setAccessible(true);
-                    field.set(entity, value);
+
+                    if (field.isAnnotationPresent(JoinColumn.class)) {
+                        Class<?> relatedType = field.getType();
+                        Object relatedInstance = relatedType.getDeclaredConstructor().newInstance();
+
+                        for (Field f : relatedType.getDeclaredFields()) {
+                            if (f.isAnnotationPresent(Id.class)) {
+                                f.setAccessible(true);
+                                f.set(relatedInstance, value);
+                                break;
+                            }
+                        }
+
+                        field.set(entity, relatedInstance);
+                    } else {
+                        field.set(entity, value);
+                    }
                 }
                 return entity;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
+
 
     @Override
     public List<Object> findAll(Class theClass) {
@@ -100,16 +112,37 @@ public class SessionImpl implements Session {
                     if (field.isAnnotationPresent(Ignore.class)) continue;
 
                     String columnName = field.getName();
-
                     if (field.isAnnotationPresent(Column.class)) {
                         columnName = field.getAnnotation(Column.class).name();
                     } else if (field.isAnnotationPresent(JoinColumn.class)) {
                         columnName = field.getAnnotation(JoinColumn.class).name();
                     }
 
+                    logger.info("columnName : " + columnName);
                     Object value = rs.getObject(columnName);
+                    logger.info("value : " + value);
                     field.setAccessible(true);
-                    field.set(entity, value);
+
+                    if (field.isAnnotationPresent(JoinColumn.class)) {
+                        // Campo de tipo entidad relacionada (FK)
+                        Class<?> fieldType = field.getType(); // CategoriaObjeto
+                        Object joinObject = fieldType.getDeclaredConstructor().newInstance();
+
+                        // Buscamos el campo con la anotación @Id en esa clase y le ponemos el valor
+                        for (Field f : fieldType.getDeclaredFields()) {
+                            if (f.isAnnotationPresent(Id.class)) {
+                                f.setAccessible(true);
+                                f.set(joinObject, value); // setId_categoria("1")
+                                break;
+                            }
+                        }
+
+                        field.set(entity, joinObject); // asignamos CategoriaObjeto con id seteado
+                    } else {
+                        // Campo simple
+                        field.set(entity, value);
+                    }
+
                 }
 
                 results.add(entity);
@@ -144,7 +177,6 @@ public class SessionImpl implements Session {
                     if (field.isAnnotationPresent(Ignore.class)) continue;
 
                     String columnName = field.getName();
-
                     if (field.isAnnotationPresent(Column.class)) {
                         columnName = field.getAnnotation(Column.class).name();
                     } else if (field.isAnnotationPresent(JoinColumn.class)) {
@@ -153,7 +185,23 @@ public class SessionImpl implements Session {
 
                     Object value = rs.getObject(columnName);
                     field.setAccessible(true);
-                    field.set(entity, value);
+
+                    if (field.isAnnotationPresent(JoinColumn.class)) {
+                        Class<?> relatedType = field.getType();
+                        Object relatedInstance = relatedType.getDeclaredConstructor().newInstance();
+
+                        for (Field f : relatedType.getDeclaredFields()) {
+                            if (f.isAnnotationPresent(Id.class)) {
+                                f.setAccessible(true);
+                                f.set(relatedInstance, value);
+                                break;
+                            }
+                        }
+
+                        field.set(entity, relatedInstance);
+                    } else {
+                        field.set(entity, value);
+                    }
                 }
 
                 results.add(entity);
@@ -165,6 +213,7 @@ public class SessionImpl implements Session {
 
         return results;
     }
+
 
     @Override
     public void update(Object entity) {

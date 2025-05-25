@@ -1,5 +1,6 @@
 package edu.upc.dsa.models;
 
+import edu.upc.dsa.util.RandomUtils;
 import edu.upc.dsa.util.annotations.*;
 
 @Table(name="categoria_objeto")
@@ -12,9 +13,10 @@ public class CategoriaObjeto {
     @Column(name="nombre")
     private String nombre;
 
-    public CategoriaObjeto() {}
+    public CategoriaObjeto() {setId_categoria(RandomUtils.getId());}
 
     public CategoriaObjeto(String id_categoria, String nombre) {
+        this(); // Llama al constructor sin parámetros (asigna un id aleatorio).        if (id_categoria != null) setId_categoria(id_categoria);
         setId_categoria(id_categoria);
         setNombre(nombre);
     }

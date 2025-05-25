@@ -19,14 +19,14 @@ public class CatObjetoManagerTest {
 
     @Before
     public void setUp() {
-        this.com = new CatObjetoManagerImpl(); // Usa ICatObjetoDAOImpl por defecto
+        this.com = new CatObjetoManagerImpl(); // Usa DAO que accede a base de datos
     }
 
     @Test
     public void testGetAllCatObjeto() {
         List<CategoriaObjeto> categorias = this.com.getAllCatObjeto();
         assertNotNull(categorias);
-        assertTrue(categorias.size() >= 3); // ya hay 3 insertadas por SQL
+        assertTrue(categorias.size() >= 3); // ARMAS, ARMADURAS, POCIONES
     }
 
     @Test
@@ -38,53 +38,58 @@ public class CatObjetoManagerTest {
 
     @Test
     public void testAddCatObjeto() {
-        String id = "100";
+        String id = "999";
         String nombre = "HECHIZOS";
 
         // Asegúrate de no tener ya esta categoría para evitar conflicto
         CategoriaObjeto existente = this.com.getCatObjeto(id);
-        if (existente == null) {
-            CategoriaObjeto nueva = this.com.addCatObjeto(id, nombre);
-            assertNotNull(nueva);
-            assertEquals(nombre, nueva.getNombre());
+        if (existente != null) {
+            this.com.deleteCatObjeto(id); // limpiamos si quedó de otro test
         }
 
-        // No permitir añadir con nombre duplicado (case-insensitive)
+        CategoriaObjeto nueva = this.com.addCatObjeto(id, nombre);
+        assertNotNull(nueva);
+        assertEquals(nombre, nueva.getNombre());
+
+        // Comprobar que no se puede insertar otra con el mismo nombre (case-insensitive)
         assertThrows(CatObjetoYaExisteException.class, () -> {
-            this.com.addCatObjeto("otraID", "armas"); // ya existe como "ARMAS"
+            this.com.addCatObjeto("otraID", "armas"); // "ARMAS" ya existe
         });
+
+        // Limpieza
         this.com.deleteCatObjeto(id);
         assertNull(this.com.getCatObjeto(id));
     }
 
     @Test
     public void testUpdateCatObjeto() {
-        String id = "101";
-        String nombreOriginal = "CONSUMIBLES";
-        String nuevoNombre = "HECHIZOS";
+        String id = "998";
+        String nombreOriginal = "TEMP";
+        String nuevoNombre = "MODIFICADA";
 
-        // Asegurarse de que existe
-        CategoriaObjeto existente = this.com.getCatObjeto(id);
-        if (existente == null) {
+        // Añadir o resetear si ya existe
+        CategoriaObjeto cat = this.com.getCatObjeto(id);
+        if (cat == null) {
             this.com.addCatObjeto(id, nombreOriginal);
+        } else {
+            this.com.updateCatObjeto(id, nombreOriginal);
         }
 
-        // Actualizar el nombre
         this.com.updateCatObjeto(id, nuevoNombre);
 
         CategoriaObjeto actualizada = this.com.getCatObjeto(id);
         assertNotNull(actualizada);
         assertEquals(nuevoNombre, actualizada.getNombre());
 
+        // Limpieza
         this.com.deleteCatObjeto(id);
         assertNull(this.com.getCatObjeto(id));
     }
 
     @Test
     public void testDeleteCatObjeto() {
-        // Añadimos temporalmente y luego eliminamos
-        String id = "999";
-        String nombre = "TEMPORAL";
+        String id = "997";
+        String nombre = "BORRAR";
 
         CategoriaObjeto nueva = this.com.addCatObjeto(id, nombre);
         assertNotNull(this.com.getCatObjeto(id));
@@ -96,6 +101,6 @@ public class CatObjetoManagerTest {
     @Test
     public void testSizeCatObjeto() {
         int size = this.com.sizeCatObjeto();
-        assertTrue(size >= 3); // por lo menos las 3 de base
+        assertTrue(size >= 3); // Las 3 de base
     }
 }
