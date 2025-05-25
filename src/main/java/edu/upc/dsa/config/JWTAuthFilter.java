@@ -17,12 +17,14 @@ public class JWTAuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String fullPath = requestContext.getUriInfo().getRequestUri().toString();
-        if (fullPath.contains("/usuarios/login") || fullPath.contains("/usuarios/register")) {
-            return;
-        }
         String path = requestContext.getUriInfo().getPath();
 
+        // Excluir rutas que contienen "usuarios"
+        if (path.contains("usuarios")) {
+            return;
+        }
+
+        // Excluir rutas de swagger, api-docs, wadl, etc
         if (path.startsWith("swagger") ||
                 path.equals("swagger.json") ||
                 path.equals("application.wadl") ||
