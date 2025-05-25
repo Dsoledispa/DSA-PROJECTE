@@ -4,6 +4,7 @@ import edu.upc.dsa.db.orm.dao.UsuarioDAO;
 import edu.upc.dsa.db.orm.dao.UsuarioDAOImpl;
 import edu.upc.dsa.exceptions.usuario.PasswordNotMatchException;
 import edu.upc.dsa.exceptions.usuario.UsuarioNotFoundException;
+import edu.upc.dsa.exceptions.usuario.UsuarioNotInsertedDbException;
 import edu.upc.dsa.exceptions.usuario.UsuarioYaExisteException;
 import edu.upc.dsa.models.Usuario;
 import org.apache.log4j.Logger;
@@ -36,9 +37,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
         int result = usuarioDAO.addUsuario(u.getNombreUsu(), u.getPassword());
         if (result != 1) {
             logger.error("Error al añadir usuario: " + u);
-            // Podrías lanzar excepción aquí si quieres:
-            // throw new RuntimeException("Error al insertar usuario en BD");
-            return null;
+            throw new UsuarioNotInsertedDbException("Error al insertar usuario en BD");
         }
         logger.info("Usuario añadido: " + u);
         return u;

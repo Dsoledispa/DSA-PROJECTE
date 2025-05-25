@@ -14,7 +14,7 @@ public class Partida {
     private String id_partida;
 
     // id_usuario es el nombre del usuario
-    @JoinColumn(name = "id_usuario", referencedColumnName = "nombreUsu")
+    @Column(name = "id_usuario")
     private String id_usuario;
 
     @Column(name = "vidas")
