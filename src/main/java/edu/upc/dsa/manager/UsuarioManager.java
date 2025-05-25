@@ -19,7 +19,7 @@ public interface UsuarioManager {
     Usuario loginUsuario(String nombreUsu, String password);
     // Login
 
-    void updateUsuario(String nombreUsu, String nuevoPassword);
+    void updateUsuario(Usuario u);
 
     void deleteUsuario(String nombreUsu);
 

@@ -105,22 +105,22 @@ public class UsuarioService {
         }
     }
 
-//    @PUT
-//    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos del usuario")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Usuario actualizado"),
-//            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-//    })
-//    @Path("/{nombreUsu}")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response updateUsuario(@PathParam("nombreUsu") String nombreUsu, Usuario usuarioActualizado) {
-//        try {
-//            this.um.updateUsuario(nombreUsu, usuarioActualizado);
-//            return Response.ok("{\"mensaje\":\"Usuario actualizado\"}").build();
-//        } catch (UsuarioNotFoundException e) {
-//            return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
-//        }
-//    }
+    @PUT
+    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos del usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario actualizado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUsuario(Usuario usuarioActualizado) {
+        try {
+            this.um.updateUsuario(usuarioActualizado);
+            return Response.ok("{\"mensaje\":\"Usuario actualizado\"}").build();
+        } catch (UsuarioNotFoundException e) {
+            return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
+        }
+    }
+
 
     @DELETE
     @Operation(summary = "Eliminar usuario", description = "Elimina el usuario con el nombre dado")

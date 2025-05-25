@@ -7,13 +7,13 @@ import java.util.List;
 public interface UsuarioDAO {
     // Añade un usuario y devuelve un entero (podríamos usar 1 para éxito o 0 para fallo,
     // ya que no tienes id numérico)
-    int addUsuario(String nombreUsu, String password);
+    int addUsuario(Usuario usuario);
 
     // Obtiene un usuario por nombre de usuario (clave primaria)
     Usuario getUsuario(String nombreUsu);
 
     // Actualiza datos de usuario identificado por nombreUsu
-    void updateUsuario(String nombreUsu, String password);
+    void updateUsuario(Usuario usuario);
 
     // Borra un usuario por nombreUsu
     void deleteUsuario(String nombreUsu);

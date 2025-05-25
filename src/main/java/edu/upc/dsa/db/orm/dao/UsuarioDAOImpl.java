@@ -13,15 +13,14 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     final static Logger logger = Logger.getLogger(UsuarioDAOImpl.class);
 
     @Override
-    public int addUsuario(String nombreUsu, String password) {
+    public int addUsuario(Usuario usuario) {
         Session session = null;
         int result = 0;
         try {
             session = FactorySession.openSession();
-            Usuario usuario = new Usuario(nombreUsu, password);
-            logger.info("A ver que pasa aui "+usuario);
             session.save(usuario);
             result = 1;
+            logger.info("Usuario guardado en la base de datos: " + usuario.getNombreUsu());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -46,15 +45,12 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
-    public void updateUsuario(String nombreUsu, String password) {
+    public void updateUsuario(Usuario usuario) {
         Session session = null;
         try {
-            Usuario usuario = this.getUsuario(nombreUsu);
-            if (usuario != null) {
-                usuario.setPassword(password);
-                session = FactorySession.openSession();
-                session.update(usuario);
-            }
+            session = FactorySession.openSession();
+            session.update(usuario);
+            logger.info("Usuario actualizado: " + usuario.getNombreUsu());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

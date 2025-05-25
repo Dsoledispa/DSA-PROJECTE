@@ -72,10 +72,10 @@ public class CatObjetoManagerTest {
         if (cat == null) {
             this.com.addCatObjeto(id, nombreOriginal);
         } else {
-            this.com.updateCatObjeto(id, nombreOriginal);
+            this.com.updateCatObjeto(new CategoriaObjeto(id, nombreOriginal));
         }
 
-        this.com.updateCatObjeto(id, nuevoNombre);
+        this.com.updateCatObjeto(new CategoriaObjeto(id, nuevoNombre));
 
         CategoriaObjeto actualizada = this.com.getCatObjeto(id);
         assertNotNull(actualizada);
@@ -85,6 +85,7 @@ public class CatObjetoManagerTest {
         this.com.deleteCatObjeto(id);
         assertNull(this.com.getCatObjeto(id));
     }
+
 
     @Test
     public void testDeleteCatObjeto() {

@@ -34,7 +34,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
         String hashedPassword = BCrypt.hashpw(u.getPassword(), BCrypt.gensalt());
         u.setPassword(hashedPassword);
         logger.info("Que esta pasando"+u);
-        int result = usuarioDAO.addUsuario(u.getNombreUsu(), u.getPassword());
+        int result = usuarioDAO.addUsuario(u);
         if (result != 1) {
             logger.error("Error al añadir usuario: " + u);
             throw new UsuarioNotInsertedDbException("Error al insertar usuario en BD");
@@ -71,19 +71,19 @@ public class UsuarioManagerImpl implements UsuarioManager {
     }
 
     @Override
-    public void updateUsuario(String nombreUsu, String nuevoPassword){
-        Usuario u = usuarioDAO.getUsuario(nombreUsu);
-        if (u == null) {
-            logger.error("No se puede actualizar usuario, no encontrado: " + nombreUsu);
-            throw new UsuarioNotFoundException(nombreUsu + " no encontrado");
+    public void updateUsuario(Usuario u) {
+        Usuario existente = usuarioDAO.getUsuario(u.getNombreUsu());
+        if (existente == null) {
+            logger.error("No se puede actualizar usuario, no encontrado: " + u.getNombreUsu());
+            throw new UsuarioNotFoundException(u.getNombreUsu() + " no encontrado");
         }
 
-        // Cifrar nueva contraseña
-        String hashedPassword = BCrypt.hashpw(nuevoPassword, BCrypt.gensalt());
+        // Cifrar la nueva contraseña antes de guardar
+        String hashedPassword = BCrypt.hashpw(u.getPassword(), BCrypt.gensalt());
+        u.setPassword(hashedPassword);
 
-        // Actualizar en base de datos
-        usuarioDAO.updateUsuario(nombreUsu, hashedPassword);
-        logger.info("Contraseña actualizada para usuario: " + nombreUsu);
+        usuarioDAO.updateUsuario(u);
+        logger.info("Usuario actualizado: " + u.getNombreUsu());
     }
 
     @Override

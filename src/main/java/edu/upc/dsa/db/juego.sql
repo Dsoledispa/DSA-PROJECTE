@@ -54,12 +54,6 @@ INSERT INTO categoria_objeto (id_categoria, nombre) VALUES
 ('2', 'ARMADURAS'),
 ('3', 'POCIONES');
 
--- Insertar usuarios de prueba
-INSERT INTO usuario (nombreUsu, password) VALUES
-('Paco', '1234'),
-('Ana', '1234'),
-('Miguel', '1234'),
-('Diego', '1234');
 
 -- Insertar productos de prueba (con IDs simples para ejemplo)
 INSERT INTO objeto (id_objeto, nombre, precio, imagen, descripcion, id_categoria) VALUES
@@ -67,5 +61,5 @@ INSERT INTO objeto (id_objeto, nombre, precio, imagen, descripcion, id_categoria
 ('2', 'Armadura', 50, '/img/armadura.png', 'Una armadura', '2'),
 ('3', 'Poción', 20, '/img/pocion.png', 'Una pocion', '3');
 
--- Nota: Las partidas e inventario se insertan desde la aplicación
+-- Nota: Los usuarios, partidas e inventario se insertan desde la aplicación
 

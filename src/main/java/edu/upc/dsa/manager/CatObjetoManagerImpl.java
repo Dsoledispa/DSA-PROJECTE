@@ -43,7 +43,7 @@ public class CatObjetoManagerImpl implements CatObjetoManager {
             throw new CatObjetoYaExisteException(categoria.getNombre());
         }
 
-        int result = catObjetoDAO.addCategoriaObjeto(categoria.getId_categoria(), categoria.getNombre());
+        int result = catObjetoDAO.addCategoriaObjeto(categoria);
         if (result == 1) {
             logger.info("addCatObjeto: " + categoria);
             return categoria;
@@ -58,25 +58,27 @@ public class CatObjetoManagerImpl implements CatObjetoManager {
         return this.addCatObjeto(new CategoriaObjeto(id_categoria, nombre));
     }
 
-    public void updateCatObjeto(String id_categoria, String nuevoNombre) {
-        CategoriaObjeto categoria = catObjetoDAO.getCategoriaObjeto(id_categoria);
+    @Override
+    public void updateCatObjeto(CategoriaObjeto categoria) {
+        CategoriaObjeto existente = catObjetoDAO.getCategoriaObjeto(categoria.getId_categoria());
 
-        if (categoria == null) {
-            logger.warn("No se encontró la categoría con id='" + id_categoria + "' para actualizar");
+        if (existente == null) {
+            logger.warn("No se encontró la categoría con id='" + categoria.getId_categoria() + "' para actualizar");
             return;
         }
 
-        // Verificamos que no haya otra categoría con el mismo nombre
+        // Verificar que no haya otra categoría con el mismo nombre
         boolean yaExiste = catObjetoDAO.getCategoriasObjeto().stream()
-                .anyMatch(c -> !c.getId_categoria().equals(id_categoria) && c.getNombre().equalsIgnoreCase(nuevoNombre));
+                .anyMatch(c -> !c.getId_categoria().equals(categoria.getId_categoria())
+                        && c.getNombre().equalsIgnoreCase(categoria.getNombre()));
 
         if (yaExiste) {
-            logger.warn("Ya existe otra categoría con nombre='" + nuevoNombre + "', no se puede actualizar");
-            throw new CatObjetoYaExisteException(nuevoNombre);
+            logger.warn("Ya existe otra categoría con nombre='" + categoria.getNombre() + "', no se puede actualizar");
+            throw new CatObjetoYaExisteException(categoria.getNombre());
         }
 
-        catObjetoDAO.updateCategoriaObjeto(id_categoria, nuevoNombre);
-        logger.info("updateCatObjeto: categoría con id='" + id_categoria + "' actualizada a nombre='" + nuevoNombre + "'");
+        catObjetoDAO.updateCategoriaObjeto(categoria);
+        logger.info("updateCatObjeto: categoría con id='" + categoria.getId_categoria() + "' actualizada a nombre='" + categoria.getNombre() + "'");
     }
 
     @Override

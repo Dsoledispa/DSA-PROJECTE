@@ -10,12 +10,11 @@ import java.util.List;
 public class CatObjetoDAOImpl implements CatObjetoDAO {
 
     @Override
-    public int addCategoriaObjeto(String id_categoria, String nombre) {
+    public int addCategoriaObjeto(CategoriaObjeto categoria) {
         Session session = null;
         int result = 0;
         try {
             session = FactorySession.openSession();
-            CategoriaObjeto categoria = new CategoriaObjeto(id_categoria, nombre);
             session.save(categoria);
             result = 1;
         } catch (Exception e) {
@@ -42,14 +41,15 @@ public class CatObjetoDAOImpl implements CatObjetoDAO {
     }
 
     @Override
-    public void updateCategoriaObjeto(String id_categoria, String nombre) {
+    public void updateCategoriaObjeto(CategoriaObjeto categoria) {
         Session session = null;
         try {
-            CategoriaObjeto categoria = this.getCategoriaObjeto(id_categoria);
-            if (categoria != null) {
-                categoria.setNombre(nombre);
+            // Confirmamos que la categoría existe
+            CategoriaObjeto existente = this.getCategoriaObjeto(categoria.getId_categoria());
+            if (existente != null) {
+                existente.setNombre(categoria.getNombre());
                 session = FactorySession.openSession();
-                session.update(categoria);
+                session.update(existente);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -21,7 +21,7 @@ public class UsuarioManagerTest {
 
     @Before
     public void setUp() {
-        this.um = new UsuarioManagerImpl(); // No singleton, usa DAO
+        this.um = new UsuarioManagerImpl();
     }
 
     @Test
@@ -116,7 +116,8 @@ public class UsuarioManagerTest {
             assertEquals(nombreUsu, u.getNombreUsu());
 
             // Actualizar contraseña
-            um.updateUsuario(nombreUsu, newPass);
+            Usuario actualizado = new Usuario(nombreUsu, newPass);
+            um.updateUsuario(actualizado);
 
             // Login con antigua debe fallar
             assertThrows(PasswordNotMatchException.class, () -> {

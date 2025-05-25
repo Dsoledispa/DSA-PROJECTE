@@ -84,7 +84,7 @@ public class TiendaManagerTest {
     @Test
     public void getProductoAleatorioTest() {
 
-        // Llamamos al método a testear
+        // Llamamos al metodo a testear
         Objeto aleatorio = tm.getProductoAleatorio();
 
         // Verificamos que no sea null
