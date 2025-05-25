@@ -13,6 +13,7 @@ import java.util.Collections;
 public class SwaggerConfiguration implements ContextResolver<OpenAPI> {
     final static Logger logger = Logger.getLogger(SwaggerConfiguration.class);
 
+
     @Override
     public OpenAPI getContext(Class<?> type) {
         logger.info("Funcionas");

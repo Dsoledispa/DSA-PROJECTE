@@ -1,28 +1,28 @@
 package edu.upc.dsa;
 
+import edu.upc.dsa.config.JWTAuthFilter;
 import edu.upc.dsa.config.SwaggerConfiguration;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-public class Jackson extends ResourceConfig {
-    public Jackson() {
-        // Paquete donde están tus servicios REST
+public class AppConfig extends ResourceConfig {
+    public AppConfig() {
+        // Paquete con tus servicios REST
         packages("edu.upc.dsa.services");
 
-        // Registro de Jackson para JSON
+        // Soporte JSON con Jackson
         register(JacksonFeature.class);
 
-        // Registro del filtro JWT
-        register(edu.upc.dsa.config.JWTAuthFilter.class);
+        // Filtro JWT para autenticación
+        register(JWTAuthFilter.class);
 
-        // Registro de la configuración personalizada de Swagger
+        // Configuración personalizada de Swagger (OpenAPI)
         register(SwaggerConfiguration.class);
 
-        // Registro del endpoint OpenAPI /openapi.json
+        // Endpoint para openapi.json
         register(OpenApiResource.class);
-
-
     }
 }
+
 

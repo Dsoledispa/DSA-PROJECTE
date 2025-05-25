@@ -8,28 +8,30 @@ import java.io.IOException;
 import java.net.URI;
 
 public class Main {
+
     public static final String BASE_URI = "http://0.0.0.0:8080/dsaApp/";
 
     public static HttpServer startServer() {
-        // Configura Jersey con la clase Jackson
-        final Jackson rc = new Jackson();
+        // Configura Jersey con la clase AppConfig
+        final AppConfig rc = new AppConfig();
 
-        // Crea y arranca el servidor Grizzly
+        // Crea y arranca el servidor Grizzly en la URI BASE_URI
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
     public static void main(String[] args) throws IOException {
         final HttpServer server = startServer();
 
-        // Sirve los archivos estáticos en /public (para Swagger UI o frontend)
+        // Sirve archivos estáticos (Swagger UI, frontend, etc) en / (raíz)
         StaticHttpHandler staticHandler = new StaticHttpHandler("./public/");
         server.getServerConfiguration().addHttpHandler(staticHandler, "/");
 
-        System.out.println(String.format("Servidor arrancado en %s\n" +
-                "Documentación OpenAPI disponible en %sopenapi.json\n" +
-                "Pulsa Enter para parar...", BASE_URI, BASE_URI));
+        System.out.println(String.format(
+                "Servidor arrancado en %s\nDocumentación OpenAPI en %sopenapi.json\nPulsa Enter para parar...",
+                BASE_URI, BASE_URI));
 
         System.in.read();
         server.shutdownNow();
     }
 }
+
