@@ -11,6 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Date;
 
 @Path("/usuarios")
+@Tag(name = "Usuarios", description = "Operaciones relacionadas con usuarios")
 public class UsuarioService {
 
     final static Logger logger = Logger.getLogger(UsuarioService.class);

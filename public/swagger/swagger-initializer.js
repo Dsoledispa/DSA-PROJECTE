@@ -13,7 +13,21 @@ window.onload = function() {
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
     ],
-    layout: "StandaloneLayout"
+    layout: "StandaloneLayout",
+
+    // Interceptor para capturar el token después del login
+    responseInterceptor: function (response) {
+      if (response.url.includes("/usuarios/login") && response.status === 201) {
+        const json = JSON.parse(response.data);
+        const token = json.token;
+        if (token) {
+            // Setear el token automáticamente
+            ui.preauthorizeApiKey("bearerAuth", token);
+            console.log("Token JWT establecido en Swagger automáticamente:", token);
+        }
+      }
+      return response;
+    }
   });
 
   //</editor-fold>

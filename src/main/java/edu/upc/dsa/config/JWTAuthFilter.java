@@ -2,6 +2,8 @@ package edu.upc.dsa.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.apache.log4j.Logger;
+
 import javax.ws.rs.container.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
@@ -13,6 +15,8 @@ import java.security.Principal;
 @PreMatching
 public class JWTAuthFilter implements ContainerRequestFilter {
 
+    final static Logger logger = Logger.getLogger(JWTAuthFilter.class);
+
     private static final String secretKey = "d42a2373271508dae325e933cddcfe13d504512272bdb6e89123f2e80717ad9d"; // Clave secreta
 
     @Override
@@ -20,10 +24,9 @@ public class JWTAuthFilter implements ContainerRequestFilter {
         String path = requestContext.getUriInfo().getPath();
 
         // Excluir rutas que contienen "usuarios"
-        if (path.contains("usuarios")) {
+        if (path.equals("usuarios/login") || path.equals("usuarios/register")) {
             return;
         }
-
         // Excluir rutas de swagger, api-docs, wadl, etc
         if (path.startsWith("swagger") ||
                 path.equals("swagger.json") ||

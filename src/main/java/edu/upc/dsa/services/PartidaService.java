@@ -1,133 +1,208 @@
-//package edu.upc.dsa.services;
-//
-//
-//import edu.upc.dsa.config.IniciarDatos;
-//import edu.upc.dsa.manager.PartidaManager;
-//import edu.upc.dsa.manager.PartidaManagerImpl;
-//import edu.upc.dsa.models.Partida;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiOperation;
-//import io.swagger.annotations.ApiResponse;
-//import io.swagger.annotations.ApiResponses;
-//import org.apache.log4j.Logger;
-//
-//import javax.ws.rs.*;
-//import javax.ws.rs.core.Context;
-//import javax.ws.rs.core.MediaType;
-//import javax.ws.rs.core.Response;
-//import javax.ws.rs.core.SecurityContext;
-//import java.util.List;
-//
-//@Api(value = "/partidas", description = "Servicio de partida")
-//@Path("/partidas")
-//public class PartidaService {
-//
-//    final static Logger logger = Logger.getLogger(PartidaService.class);
-//    private final PartidaManager pm;
-//
-//    @Context
-//    SecurityContext securityContext;
-//
-//    public PartidaService() {
-//        this.pm = PartidaManagerImpl.getInstance();
-//        IniciarDatos.init(); // Asegurarse de que los datos están cargados
-//    }
-//
-//    @POST
-//    @ApiOperation(value = "Crear una nueva partida", notes = "Crea una nueva partida para un usuario existente")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 201, message = "Partida registrada correctamente", response = Partida.class),
-//            @ApiResponse(code = 500, message = "Error interno")
-//    })
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response newPartida() {
-//        try {
-//            String nombreUsu = securityContext.getUserPrincipal().getName();
-//            Partida nuevaPartida = this.pm.addPartida(nombreUsu);
-//            return Response.status(201).entity(nuevaPartida).build();
-//        } catch (Exception e) {
-//            logger.error("Error al crear la partida: " + e.getMessage(), e);
-//            return Response.status(500).entity("{\"error\":\"" + e.getMessage() + "\"}").build();
-//        }
-//    }
-//
-//    @GET
-//    @ApiOperation(value = "Obtener las partidas del usuario", notes = "Lista las partidas del usuario autenticado")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Partidas obtenidas correctamente", response = Partida.class),
-//            @ApiResponse(code = 500, message = "Error interno")
-//    })
-//
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response obtenerPartidas() {
-//        try {
-//            String nombreUsu = securityContext.getUserPrincipal().getName();
-//            List<Partida> partidas = this.pm.getPartidas(nombreUsu);
-//            return Response.status(200).entity(partidas).build();
-//        } catch (Exception e) {
-//            logger.error("Error al obtener las partidas", e);
-//            return Response.status(500).entity("{\"error\":\"Error al obtener las partidas\"}").build();
-//        }
-//    }
-//
-//    @GET
-//    @Path("/{id_partida}")
-//    @ApiOperation(value = "Obtener una partida específica del usuario", notes = "Obtiene una partida específica del usuario autenticado")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Partida obtenida correctamente", response = Partida.class),
-//            @ApiResponse(code = 404, message = "Partida no encontrada"),
-//            @ApiResponse(code = 500, message = "Error interno")
-//    })
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response obtenerPartida(@PathParam("id_partida") String id_partida) {
-//        try {
-//            String nombreUsu = securityContext.getUserPrincipal().getName();
-//            Partida partida = this.pm.getPartida(nombreUsu, id_partida); // Obtiene la partida específica
-//            return Response.status(200).entity(partida).build();
-//        } catch (Exception e) {
-//            logger.error("Error al obtener la partida", e);
-//            return Response.status(500).entity("{\"error\":\"Error al obtener la partida\"}").build();
-//        }
-//    }
-//
-//    @DELETE
-//    @Path("/{id_partida}")
-//    @ApiOperation(value = "Eliminar partida", notes = "Elimina una partida del usuario autenticado")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Partida eliminada correctamente", response = Partida.class),
-//            @ApiResponse(code = 500, message = "Error interno")
-//    })
-//
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response eliminarPartida(@PathParam("id_partida") String id_partida) {
-//        try {
-//            String nombreUsu = securityContext.getUserPrincipal().getName();
-//            this.pm.deletePartida(nombreUsu, id_partida);
-//            return Response.status(200).entity("{\"message\":\"Partida eliminada\"}").build();
-//        } catch (Exception e) {
-//            logger.error("Error al eliminar la partida", e);
-//            return Response.status(500).entity("{\"error\":\"Error al eliminar la partida\"}").build();
-//        }
-//    }
-//
-//    @GET
-//    @Path("/monedas/{id_partida}")
-//    @ApiOperation(value = "Obtener las monedas de una partida específica del usuario")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Monedas obtenidas correctamente", response = Integer.class),
-//            @ApiResponse(code = 404, message = "Partida no encontrada"),
-//            @ApiResponse(code = 500, message = "Error interno")
-//    })
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public Response obtenerMonedasDePartida(@PathParam("id_partida") String id_partida) {
-//        try {
-//            String nombreUsu = securityContext.getUserPrincipal().getName();
-//            int monedas = pm.getMonedasDePartida(nombreUsu, id_partida); // Obtiene las monedas de la partida
-//            return Response.status(200).entity("{\"monedas\":" + monedas + "}").build();
-//        } catch (Exception e) {
-//            logger.error("Error al obtener las monedas de la partida", e);
-//            return Response.status(500).entity("{\"error\":\"Error al obtener las monedas\"}").build();
-//        }
-//    }
-//}
+package edu.upc.dsa.services;
+
+import edu.upc.dsa.manager.PartidaManager;
+import edu.upc.dsa.manager.PartidaManagerImpl;
+import edu.upc.dsa.models.Partida;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.log4j.Logger;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import java.util.List;
+
+@Path("/partidas")
+@Tag(name = "Partida", description = "Operaciones relacionadas con Partidas")
+public class PartidaService {
+
+    final static Logger logger = Logger.getLogger(PartidaService.class);
+    private final PartidaManager pm = new PartidaManagerImpl();
+
+    @Context
+    SecurityContext securityContext;
+
+    @POST
+    @Path("/create")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Crear una nueva partida para el usuario autenticado",
+            description = "Crea una nueva partida asociada al usuario identificado en el token JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Partida creada",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Partida.class))),
+            @ApiResponse(responseCode = "500", description = "Error interno al crear partida")
+    })
+    public Response addPartida(Partida partida) {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            partida.setId_usuario(id_usuario);
+            Partida creada = pm.addPartida(partida);
+            if (creada != null) return Response.status(201).entity(creada).build();
+            return Response.status(400).entity("{\"error\":\"No se pudo crear la partida\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al crear partida", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al crear partida\"}").build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Crear partida para el usuario autenticado (sin datos explícitos)",
+            description = "Crea una partida vacía o con valores por defecto para el usuario del token JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Partida creada",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Partida.class))),
+            @ApiResponse(responseCode = "500", description = "Error interno al crear partida")
+    })
+    public Response addPartidaSinDatos() {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            logger.info("ID_usuario: " +id_usuario);
+            Partida creada = pm.addPartida(id_usuario);
+            if (creada != null) return Response.status(201).entity(creada).build();
+            return Response.status(400).entity("{\"error\":\"No se pudo crear la partida\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al crear partida sin datos", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al crear partida sin datos\"}").build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Obtener todas las partidas del usuario autenticado",
+            description = "Devuelve todas las partidas asociadas al usuario del token JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de partidas devuelta",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Partida.class))),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener partidas")
+    })
+    public Response getPartidas() {
+        logger.info(">>> Entrando al método getPartidas()");
+        try {
+            logger.info("SecurityContext: " + securityContext);
+            logger.info("SecurityContext.getUsuerPrincipal: " + securityContext.getUserPrincipal());
+            String id_usuario = securityContext.getUserPrincipal().getName();
+
+            logger.info("Este id usuario es: " +id_usuario);
+            List<Partida> partidas = pm.getPartidas(id_usuario);
+            return Response.ok(partidas).build();
+        } catch (Exception e) {
+            logger.error("Error al obtener partidas", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al obtener partidas\"}").build();
+        }
+    }
+
+    @GET
+    @Path("/{id_partida}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Obtener una partida específica del usuario autenticado",
+            description = "Devuelve una partida dada su ID asociada al usuario del token JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Partida encontrada",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Partida.class))),
+            @ApiResponse(responseCode = "404", description = "Partida no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener partida")
+    })
+    public Response getPartida(@Parameter(description = "ID de la partida") @PathParam("id_partida") String id_partida) {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            Partida partida = pm.getPartida(id_usuario, id_partida);
+            if (partida != null) return Response.ok(partida).build();
+            return Response.status(404).entity("{\"error\":\"Partida no encontrada\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al obtener partida", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al obtener partida\"}").build();
+        }
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Actualizar una partida",
+            description = "Actualiza los datos de una partida (debe contener id_usuario y id_partida correctos)",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Partida actualizada correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al actualizar partida")
+    })
+    public Response updatePartida(Partida partida) {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            if (!id_usuario.equals(partida.getId_usuario())) {
+                return Response.status(403).entity("{\"error\":\"No autorizado para actualizar esta partida\"}").build();
+            }
+            pm.updatePartida(partida);
+            return Response.ok("{\"mensaje\":\"Partida actualizada correctamente\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al actualizar partida", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al actualizar partida\"}").build();
+        }
+    }
+
+    @DELETE
+    @Path("/{id_partida}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Eliminar una partida del usuario autenticado",
+            description = "Elimina una partida dado su ID para el usuario del token JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Partida eliminada correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno al eliminar partida")
+    })
+    public Response deletePartida(@Parameter(description = "ID de la partida") @PathParam("id_partida") String id_partida) {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            pm.deletePartida(id_usuario, id_partida);
+            return Response.ok("{\"mensaje\":\"Partida eliminada correctamente\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al eliminar partida", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al eliminar partida\"}").build();
+        }
+    }
+
+    @GET
+    @Path("/{id_partida}/monedas")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Obtener monedas de una partida específica",
+            description = "Devuelve la cantidad de monedas de la partida dada por id_partida para el usuario del token JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Cantidad de monedas devuelta"),
+            @ApiResponse(responseCode = "500", description = "Error interno al obtener monedas")
+    })
+    public Response getMonedasDePartida(@Parameter(description = "ID de la partida") @PathParam("id_partida") String id_partida) {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            int monedas = pm.getMonedasDePartida(id_usuario, id_partida);
+            return Response.ok("{\"monedas\":" + monedas + "}").build();
+        } catch (Exception e) {
+            logger.error("Error al obtener monedas de partida", e);
+            return Response.status(500).entity("{\"error\":\"Error interno al obtener monedas\"}").build();
+        }
+    }
+}
+

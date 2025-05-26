@@ -1,5 +1,7 @@
 package edu.upc.dsa.manager;
 
+import edu.upc.dsa.db.orm.dao.CatObjetoDAO;
+import edu.upc.dsa.db.orm.dao.CatObjetoDAOImpl;
 import edu.upc.dsa.db.orm.dao.ObjetoDAO;
 import edu.upc.dsa.db.orm.dao.ObjetoDAOImpl;
 import edu.upc.dsa.models.CategoriaObjeto;
@@ -12,9 +14,11 @@ import java.util.Random;
 public class TiendaManagerImpl implements TiendaManager {
 
     final static Logger logger = Logger.getLogger(TiendaManagerImpl.class);
+    private CatObjetoDAO catObjetoDAO;
     private final ObjetoDAO objetoDAO;
 
     public TiendaManagerImpl() {
+        this.catObjetoDAO = new CatObjetoDAOImpl();
         this.objetoDAO = new ObjetoDAOImpl();
     }
 
