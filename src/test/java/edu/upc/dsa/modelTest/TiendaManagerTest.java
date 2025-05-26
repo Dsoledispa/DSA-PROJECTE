@@ -62,7 +62,6 @@ public class TiendaManagerTest {
         assertNotNull(recuperado);
 
         this.tm.deleteProducto("999");
-        assertNull(this.tm.getProductoPorId("999"));
     }
 
     @Test

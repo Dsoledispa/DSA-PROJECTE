@@ -68,7 +68,7 @@ $(document).ready(function () {
 
 function cargarMonedas() {
   ajaxConToken({
-    url: `${BASE_URL}/partidas/monedas/${idPartida}`,
+    url: `${BASE_URL}/partidas/${idPartida}/monedas`,
     method: "GET"
   }).done(data => {
     $("#monedasCantidad").text(data.monedas + " monedas");
@@ -77,18 +77,18 @@ function cargarMonedas() {
 
 function cargarCategorias() {
   ajaxConToken({
-    url: `${BASE_URL}/tienda/categorias`,
+    url: `${BASE_URL}/categoria`,
     method: "GET"
   }).done(categorias => {
     $("#categorias").append(`<button class="btn btn-outline-primary me-2 mb-2 categoria-btn" data-cat="">Todos</button>`);
-
+    
     categorias.forEach(cat => {
-      $("#categorias").append(`<button class="btn btn-outline-primary me-2 mb-2 categoria-btn" data-cat="${cat}">${cat}</button>`);
+      $("#categorias").append(`<button class="btn btn-outline-primary me-2 mb-2 categoria-btn" data-cat="${cat.id_categoria}">${cat.nombre}</button>`);
     });
 
     $(".categoria-btn").click(function () {
-      const categoria = $(this).data("cat");
-      cargarProductos(categoria);
+      const idCategoria = $(this).data("cat");
+      cargarProductos(idCategoria);
     });
 
     cargarProductos(); // Todos por defecto
@@ -96,12 +96,13 @@ function cargarCategorias() {
 }
 
 function cargarProductos(categoria = "") {
-  const url = categoria ? `${BASE_URL}/tienda/categorias/${categoria}` : `${BASE_URL}/tienda/productos`;
+  const url = categoria ? `${BASE_URL}/tienda/productos/categoria/${categoria}` : `${BASE_URL}/tienda/productos`;
 
   ajaxConToken({
     url: url,
     method: "GET"
   }).done(productos => {
+    console.log(productos)
     $("#productos").empty();
     productos.forEach(p => {
       $("#productos").append(`
@@ -112,7 +113,7 @@ function cargarProductos(categoria = "") {
               <h5 class="card-title">${p.nombre}</h5>
               <p class="card-text">${p.descripcion}</p>
               <p class="card-text">Precio: ${p.precio} monedas</p>
-              <p class="card-text"><span class="badge bg-secondary">${p.categoria}</span></p>
+              <p class="card-text"><span class="badge bg-secondary">${p.categoria.nombre}</span></p>
               <button class="btn btn-primary mt-auto agregar-btn" data-id="${p.id_objeto}">Agregar</button>
             </div>
           </div>

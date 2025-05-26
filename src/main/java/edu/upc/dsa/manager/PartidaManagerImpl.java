@@ -86,6 +86,16 @@ public class PartidaManagerImpl implements PartidaManager {
     }
 
     @Override
+    public void deletePartidas(String id_usuario) {
+        List<Partida> partidas = this.getPartidas(id_usuario);
+        for (Partida p : partidas) {
+            partidaDAO.deletePartida(p.getId_partida());
+            logger.info("Partida eliminada: " + p);
+        }
+        logger.info("Todas las partidas de " + id_usuario + " han sido eliminadas");
+    }
+
+    @Override
     public int getMonedasDePartida(String id_usuario, String id_partida) {
         Partida partida = this.getPartida(id_usuario, id_partida);
         return partida.getMonedas();

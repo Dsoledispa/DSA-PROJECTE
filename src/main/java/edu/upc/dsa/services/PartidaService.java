@@ -1,5 +1,6 @@
 package edu.upc.dsa.services;
 
+import edu.upc.dsa.exceptions.partida.PartidaNotFoundException;
 import edu.upc.dsa.manager.PartidaManager;
 import edu.upc.dsa.manager.PartidaManagerImpl;
 import edu.upc.dsa.models.Partida;
@@ -92,10 +93,7 @@ public class PartidaService {
             @ApiResponse(responseCode = "500", description = "Error interno al obtener partidas")
     })
     public Response getPartidas() {
-        logger.info(">>> Entrando al método getPartidas()");
         try {
-            logger.info("SecurityContext: " + securityContext);
-            logger.info("SecurityContext.getUsuerPrincipal: " + securityContext.getUserPrincipal());
             String id_usuario = securityContext.getUserPrincipal().getName();
 
             logger.info("Este id usuario es: " +id_usuario);
@@ -137,27 +135,36 @@ public class PartidaService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(
-            summary = "Actualizar una partida",
-            description = "Actualiza los datos de una partida (debe contener id_usuario y id_partida correctos)",
+            summary = "Actualizar una partida del usuario autenticado",
+            description = "Actualiza una partida existente perteneciente al usuario identificado por el token JWT",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Partida actualizada correctamente"),
+            @ApiResponse(responseCode = "200", description = "Partida actualizada correctamente",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Partida.class))),
+            @ApiResponse(responseCode = "404", description = "Partida no encontrada"),
             @ApiResponse(responseCode = "500", description = "Error interno al actualizar partida")
     })
     public Response updatePartida(Partida partida) {
         try {
             String id_usuario = securityContext.getUserPrincipal().getName();
-            if (!id_usuario.equals(partida.getId_usuario())) {
-                return Response.status(403).entity("{\"error\":\"No autorizado para actualizar esta partida\"}").build();
-            }
+            // Validamos que la partida pertenece al usuario autenticado
+            Partida existente = pm.getPartida(id_usuario, partida.getId_partida());
+
+            // Asignamos el usuario actual a la partida (por seguridad)
+            partida.setId_usuario(id_usuario);
+
             pm.updatePartida(partida);
-            return Response.ok("{\"mensaje\":\"Partida actualizada correctamente\"}").build();
+            return Response.ok(partida).build();
+        } catch (PartidaNotFoundException e) {
+            logger.warn("Partida no encontrada para actualización", e);
+            return Response.status(404).entity("{\"error\":\"Partida no encontrada\"}").build();
         } catch (Exception e) {
             logger.error("Error al actualizar partida", e);
             return Response.status(500).entity("{\"error\":\"Error interno al actualizar partida\"}").build();
         }
     }
+
 
     @DELETE
     @Path("/{id_partida}")
@@ -179,6 +186,27 @@ public class PartidaService {
         } catch (Exception e) {
             logger.error("Error al eliminar partida", e);
             return Response.status(500).entity("{\"error\":\"Error interno al eliminar partida\"}").build();
+        }
+    }
+
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Eliminar todas las partidas del usuario autenticado",
+            description = "Elimina todas las partidas asociadas al usuario autenticado mediante JWT.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Partidas eliminadas correctamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public Response deletePartidas() {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            pm.deletePartidas(id_usuario);
+            return Response.ok("{\"mensaje\":\"Partidas eliminadas correctamente\"}").build();
+        } catch (Exception e) {
+            return Response.status(500).entity("{\"error\":\"Error interno del servidor\"}").build();
         }
     }
 

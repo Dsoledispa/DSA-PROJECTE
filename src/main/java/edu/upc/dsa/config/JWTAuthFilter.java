@@ -23,7 +23,7 @@ public class JWTAuthFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String path = requestContext.getUriInfo().getPath();
 
-        // Excluir rutas que contienen "usuarios"
+        // Excluir las siguientes rutas del filtro"
         if (path.equals("usuarios/login") || path.equals("usuarios/register")) {
             return;
         }

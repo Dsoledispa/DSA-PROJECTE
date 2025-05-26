@@ -25,6 +25,11 @@ public class TiendaManagerImpl implements TiendaManager {
     @Override
     public List<Objeto> getAllProductos() {
         List<Objeto> productos = objetoDAO.getObjetos();
+        for (Objeto producto : productos) {
+            String id_categoria = producto.getCategoria().getId_categoria();
+            CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+            producto.setCategoria(catObjeto);
+        }
         logger.info("Productos: " + productos);
         return productos;
     }
@@ -32,6 +37,10 @@ public class TiendaManagerImpl implements TiendaManager {
     @Override
     public List<Objeto> getProductosPorCategoria(String id_categoria) {
         List<Objeto> productos = objetoDAO.getObjetosByCategoria(id_categoria);
+        for (Objeto producto : productos) {
+            CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+            producto.setCategoria(catObjeto);
+        }
         logger.info("Productos por categoría (" + id_categoria + "): " + productos);
         return productos;
     }
@@ -39,6 +48,12 @@ public class TiendaManagerImpl implements TiendaManager {
     @Override
     public Objeto getProductoPorId(String id_producto) {
         Objeto producto = objetoDAO.getObjeto(id_producto);
+
+        //Inserto los datos de categoria en el producto
+        String id_categoria = producto.getCategoria().getId_categoria();
+        CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+        producto.setCategoria(catObjeto);
+
         logger.info("Producto por id_producto: " + id_producto + " es " + producto);
         return producto;
     }
@@ -52,6 +67,12 @@ public class TiendaManagerImpl implements TiendaManager {
         }
         Random rand = new Random();
         Objeto productoAleatorio = productos.get(rand.nextInt(productos.size()));
+
+        //Inserto los datos de categoria en el productoAleatorio
+        String id_categoria = productoAleatorio.getCategoria().getId_categoria();
+        CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+        productoAleatorio.setCategoria(catObjeto);
+
         logger.info("Producto aleatorio seleccionado: " + productoAleatorio);
         return productoAleatorio;
     }

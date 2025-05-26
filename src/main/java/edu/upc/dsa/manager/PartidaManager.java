@@ -24,7 +24,11 @@ public interface PartidaManager {
 
     void updatePartida(Partida partida);
 
+    // Elimina una partida del usuario
     void deletePartida(String id_usuario, String id_partida);
+
+    // Elimina todas las partidas del usuario
+    void deletePartidas(String id_usuario);
 
     // Obtener las monedas de una partida específica del usuario
     int getMonedasDePartida(String id_usuario, String id_partida);
