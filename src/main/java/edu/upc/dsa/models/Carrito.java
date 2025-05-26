@@ -1,38 +1,47 @@
 package edu.upc.dsa.models;
 
-import java.util.ArrayList;
-import java.util.List;
+import edu.upc.dsa.util.RandomUtils;
+import edu.upc.dsa.util.annotations.Column;
+import edu.upc.dsa.util.annotations.Id;
+import edu.upc.dsa.util.annotations.JoinColumn;
+import edu.upc.dsa.util.annotations.Table;
 
+@Table(name = "carrito")
 public class Carrito {
 
-    private String id_usuario;
-    private List<Objeto> objetos;
+    @Id
+    @Column(name = "id_carrito")
+    private String id_carrito;
+
+    @Column(name = "id_partida")
+    private String id_partida;
+
+    @Column(name="id_objeto")
+    private String id_objeto;
 
     public Carrito() {
-        this.objetos = new ArrayList<>();
+        setId_carrito(RandomUtils.getId());
     }
 
-    public Carrito(String id_usuario) {
-        this();
-        setId_usuario(id_usuario);
+    public Carrito(String id_carrito, String id_partida, String id_objeto) {
+        this(); // Llama al constructor sin parámetros (asigna un id aleatorio).
+        if (id_carrito != null) setId_carrito(id_carrito);
+        setId_partida(id_partida);
+        setId_objeto(id_objeto);
     }
 
-    public String getId_usuario() { return id_usuario; }
-    public void setId_usuario(String id_usuario) { this.id_usuario = id_usuario; }
+    public String getId_carrito() { return id_carrito; }
+    public void setId_carrito(String id_carrito) { this.id_carrito = id_carrito; }
 
-    public List<Objeto> getObjetos() { return objetos; }
-    public void setObjetos(List<Objeto> objetos) { this.objetos = objetos; }
+    public String getId_partida() { return id_partida; }
+    public void setId_partida(String id_partida) { this.id_partida = id_partida; }
 
-    public void agregarObjeto(Objeto objeto) { this.objetos.add(objeto); }
-    public void eliminarObjeto(String id_objeto) { this.objetos.removeIf(o -> o.getId_objeto().equals(id_objeto)); }
-
-    public int getTotal() { return objetos.stream().mapToInt(Objeto::getPrecio).sum(); }
-
-    public void vaciar() { this.objetos.clear(); }
+    public String getId_objeto() { return id_objeto; }
+    public void setId_objeto(String id_objeto) { this.id_objeto = id_objeto; }
 
     @Override
     public String toString() {
-        return "Carrito [id_usuario=" + id_usuario + ", objetos=" + objetos + "]";
+        return "Carrito [id_carrito=" + id_carrito + ", id_partida=" + id_partida + ", id_objeto=" + id_objeto+"]";
     }
 
 }

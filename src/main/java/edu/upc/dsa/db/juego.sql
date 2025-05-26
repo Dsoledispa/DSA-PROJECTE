@@ -48,18 +48,25 @@ CREATE TABLE inventario (
     FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto)
 );
 
--- Insertar categorías iniciales (con IDs definidos manualmente)
+-- Tabla carrito (objetos temporales por partida)
+CREATE TABLE carrito (
+    id_carrito VARCHAR(100) PRIMARY KEY,
+    id_partida VARCHAR(100) NOT NULL,
+    id_objeto VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_partida) REFERENCES partida(id_partida),
+    FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto)
+);
+
+-- Insertar categorías iniciales
 INSERT INTO categoria_objeto (id_categoria, nombre) VALUES
 ('1', 'ARMAS'),
 ('2', 'ARMADURAS'),
 ('3', 'POCIONES');
 
-
--- Insertar productos de prueba (con IDs simples para ejemplo)
+-- Insertar productos de prueba
 INSERT INTO objeto (id_objeto, nombre, precio, imagen, descripcion, id_categoria) VALUES
 ('1', 'Espada', 30, '/img/espada.jpg', 'Una espada', '1'),
 ('2', 'Armadura', 50, '/img/armadura.png', 'Una armadura', '2'),
 ('3', 'Poción', 20, '/img/pocion.png', 'Una pocion', '3');
 
--- Nota: Los usuarios, partidas e inventario se insertan desde la aplicación
-
+-- Nota: Los usuarios, partidas, inventario y carrito se insertan desde la aplicación
