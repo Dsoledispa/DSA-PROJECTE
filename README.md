@@ -30,12 +30,14 @@ GRANT ALL PRIVILEGES ON *.* TO 'nuevo_usuario'@'localhost' WITH GRANT OPTION;
 2. Primer clonamos el proyecto.
 3. Con maven instalamos las dependencias
 4. Compilamos con maven
-5. Ejecutamos el proyecto en Main.java
-6. Ruta localhost
+5. Entramos en la ruta src/main/java/edu/upc/dsa
+6. Dentro de db, entramos en DBUtils, y cambiamos USER por root o por otro usuario creado en MariaDB, y cambiamos la PASS (contraseña)
+7. Ejecutamos el proyecto en Main.java
+8. Ruta localhost
 ```
 http://localhost:8080/
 ```
-7. Ruta Swagger
+9. Ruta Swagger
 ```
 http://localhost:8080/swagger/#
 ```
