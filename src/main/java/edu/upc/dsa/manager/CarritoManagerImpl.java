@@ -1,14 +1,7 @@
 package edu.upc.dsa.manager;
 
-import edu.upc.dsa.db.orm.dao.CarritoDAO;
-import edu.upc.dsa.db.orm.dao.CarritoDAOImpl;
-import edu.upc.dsa.db.orm.dao.ObjetoDAO;
-import edu.upc.dsa.db.orm.dao.ObjetoDAOImpl;
-import edu.upc.dsa.db.orm.dao.PartidaDAO;
-import edu.upc.dsa.db.orm.dao.PartidaDAOImpl;
-import edu.upc.dsa.models.Carrito;
-import edu.upc.dsa.models.Objeto;
-import edu.upc.dsa.models.Partida;
+import edu.upc.dsa.db.orm.dao.*;
+import edu.upc.dsa.models.*;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -17,14 +10,18 @@ import java.util.List;
 public class CarritoManagerImpl implements CarritoManager {
 
     final static Logger logger = Logger.getLogger(CarritoManagerImpl.class);
+    private CatObjetoDAO catObjetoDAO;
     private final CarritoDAO carritoDAO;
     private final ObjetoDAO objetoDAO;
     private final PartidaDAO partidaDAO;
+    private final InventarioDAO inventarioDAO;
 
     public CarritoManagerImpl() {
+        this.catObjetoDAO = new CatObjetoDAOImpl();
         this.carritoDAO = new CarritoDAOImpl();
         this.objetoDAO = new ObjetoDAOImpl();
         this.partidaDAO = new PartidaDAOImpl();
+        this.inventarioDAO = new InventarioDAOImpl();
     }
 
     @Override
@@ -58,6 +55,9 @@ public class CarritoManagerImpl implements CarritoManager {
         for (Carrito c : registros) {
             Objeto obj = objetoDAO.getObjeto(c.getId_objeto());
             if (obj != null) {
+                String id_categoria = obj.getCategoria().getId_categoria();
+                CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+                obj.setCategoria(catObjeto);
                 objetos.add(obj);
             }
         }
@@ -92,6 +92,11 @@ public class CarritoManagerImpl implements CarritoManager {
         // Realizar la compra
         partida.setMonedas(partida.getMonedas() - total);
         partida.setInventario(objetos);
+        for (Objeto objeto : objetos){
+            String id_objeto = objeto.getId_objeto();
+            Inventario inventario = new Inventario(null, id_partida, id_objeto);
+            inventarioDAO.addInventario(inventario);
+        }
         logger.info("Que hay en partida: "+partida);
         partidaDAO.updatePartida(partida);
         carritoDAO.deleteAllFromPartida(id_partida);

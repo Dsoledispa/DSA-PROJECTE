@@ -21,9 +21,7 @@ public class CarritoManagerTest {
     PartidaManager pm;
     CarritoManager cm;
     TiendaManager tm;
-
-    private Usuario usuario;
-    private Partida partida;
+    InventarioManager im;
 
     @Before
     public void setUp(){
@@ -32,6 +30,7 @@ public class CarritoManagerTest {
         this.pm = new PartidaManagerImpl();
         this.cm = new CarritoManagerImpl();
         this.tm = new TiendaManagerImpl();
+        this.im = new InventarioManagerImpl();
         
         // Crear usuario y partida con monedas suficientes
         this.um.addUsuario("carritoTest", "1234");
@@ -40,6 +39,9 @@ public class CarritoManagerTest {
 
     @After
     public void tearDown(){
+        // Eliminamos all inventario de la partida
+        im.eliminarAllObjetosDeInventario("1");
+
         // Borrar todas las partidas del usuario UsuarioTest
         List<Partida> partidas = pm.getPartidas("carritoTest");
         for (Partida p : partidas) {
@@ -71,11 +73,10 @@ public class CarritoManagerTest {
         cm.realizarCompra("1");
 
         // Verificar inventario
-        logger.info("Que tienes aqui : "+pm.getPartida("carritoTest", "1"));
-        List<Objeto> inventario = pm.getPartida("carritoTest", "1").getInventario();
-        //logger.info("Inventario : "+ inventario);
-        //logger.info("Tamano : "+inventario.size());
-        //assertEquals(2, inventario.size());
+        List<Objeto> objetos = im.getInventarioDePartida("1");
+        logger.info("Carritosad : " +objetos);
+        logger.info("Tamano inventario: "+objetos.size());
+        assertEquals(2, objetos.size());
 
         // Verificar monedas restantes
         Partida partidaActualizada = pm.getPartida("carritoTest", "1");

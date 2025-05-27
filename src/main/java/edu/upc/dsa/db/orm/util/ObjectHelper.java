@@ -24,7 +24,7 @@ public class ObjectHelper {
 
             try {
                 Object value = field.get(obj);
-                logger.info("Value :" + value);
+                //logger.info("Value :" + value);
 
                 if (field.isAnnotationPresent(Column.class)) {
                     columnName = field.getAnnotation(Column.class).name();
@@ -32,14 +32,14 @@ public class ObjectHelper {
                 else if (field.isAnnotationPresent(JoinColumn.class)) {
                     JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
                     columnName = joinColumn.name();
-                    logger.info("Quo :" +columnName);
+                    //logger.info("Quo :" +columnName);
 
                     if (value != null) {
                         // Obtener el valor del campo referenciado dentro del objeto relacionado
                         Field referencedField = value.getClass().getDeclaredField(joinColumn.referencedColumnName());
                         referencedField.setAccessible(true);
                         value = referencedField.get(value);
-                        logger.info("NOsd " +value);
+                        //logger.info("NOsd " +value);
                     }
                 }
 

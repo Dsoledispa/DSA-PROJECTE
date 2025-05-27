@@ -33,14 +33,14 @@ function ajaxConToken(opciones) {
 // Función para cargar el inventario de la partida
 function cargarInventario() {
   ajaxConToken({
-    url: `${BASE_URL}/partidas/${idPartida}`,
+    url: `${BASE_URL}/inventario/${idPartida}`,
     method: 'GET'
   }).done(function(data) {
     const inventario = data.inventario;
     const inventarioList = $('#inventario-list');
     inventarioList.empty();
 
-    inventario.forEach(objeto => {
+    data.forEach(objeto => {
       const imagenUrl = objeto.imagen || "img/objeto.png";
       const imagen = `<img src="${imagenUrl}" class="card-img-top" alt="${objeto.nombre}">`;
 

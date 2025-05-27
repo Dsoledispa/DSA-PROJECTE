@@ -57,13 +57,8 @@ $(document).ready(function () {
   });
 
   $("#irPartidaBtn").click(() => {
-    ajaxConToken({
-      url: `${BASE_URL}/carrito`,
-      method: "DELETE"
-    }).done(() => {
       window.location.href = "partida.html";
-    }).fail(manejarError);
-  });
+  })
 });
 
 function cargarMonedas() {
@@ -121,9 +116,9 @@ function cargarProductos(categoria = "") {
     });
 
     $(".agregar-btn").click(function () {
-      const id = $(this).data("id");
+      const idObjeto = $(this).data("id");
       ajaxConToken({
-        url: `${BASE_URL}/carrito/${id}`,
+        url: `${BASE_URL}/carrito/${idPartida}/${idObjeto}`,
         method: "POST"
       }).done(cargarCarrito).fail(manejarError);
     });
@@ -132,7 +127,7 @@ function cargarProductos(categoria = "") {
 
 function cargarCarrito() {
   ajaxConToken({
-    url: `${BASE_URL}/carrito`,
+    url: `${BASE_URL}/carrito/${idPartida}`,
     method: "GET"
   }).done(objetos => {
     const tbody = $("#tablaCarrito").empty();
@@ -149,7 +144,7 @@ function cargarCarrito() {
             </div>
           </td>
           <td>${o.precio}</td>
-          <td>${o.categoria}</td>
+          <td>${o.categoria.nombre}</td>
           <td><button class="btn btn-danger btn-sm quitar-btn" data-id="${o.id_objeto}">🗑</button></td>
         </tr>`);
     });
@@ -157,9 +152,9 @@ function cargarCarrito() {
     $("#totalCarrito").text(total);
 
     $(".quitar-btn").click(function () {
-      const id = $(this).data("id");
+      const idObjeto = $(this).data("id");
       ajaxConToken({
-        url: `${BASE_URL}/carrito/${id}`,
+        url: `${BASE_URL}/carrito/${idPartida}/${idObjeto}`,
         method: "DELETE"
       }).done(cargarCarrito).fail(manejarError);
     });

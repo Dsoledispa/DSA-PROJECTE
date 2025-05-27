@@ -27,18 +27,18 @@ public class SessionImpl implements Session {
     @Override
     public void save(Object entity) {
         PreparedQuery preparedQuery = QueryHelper.createInsertQuery(entity.getClass());
-        logger.info("InsertQuery SQL: " + preparedQuery.sql);
-        logger.info("InsertQuery columns: " + preparedQuery.columns);
+        //logger.info("InsertQuery SQL: " + preparedQuery.sql);
+        //logger.info("InsertQuery columns: " + preparedQuery.columns);
 
         try (PreparedStatement pstm = conn.prepareStatement(preparedQuery.sql)){
             Map<String, Object> columnValues = ObjectHelper.objectToMap(entity);
-            logger.info("MAP " + columnValues);
+            //logger.info("MAP " + columnValues);
 
             int i = 1;
             for (String column : preparedQuery.columns) {  // Orden garantizado
                 pstm.setObject(i++, columnValues.get(column));
             }
-            logger.info("Sesion " + pstm);
+            //logger.info("Sesion " + pstm);
             pstm.executeUpdate();
 
         } catch (SQLException e) {
@@ -118,9 +118,9 @@ public class SessionImpl implements Session {
                         columnName = field.getAnnotation(JoinColumn.class).name();
                     }
 
-                    logger.info("columnName : " + columnName);
+                    //logger.info("columnName : " + columnName);
                     Object value = rs.getObject(columnName);
-                    logger.info("value : " + value);
+                    //logger.info("value : " + value);
                     field.setAccessible(true);
 
                     if (field.isAnnotationPresent(JoinColumn.class)) {
