@@ -14,10 +14,12 @@ import java.util.List;
 
 public class UsuarioManagerImpl implements UsuarioManager {
 
-    private UsuarioDAO usuarioDAO;
     final static Logger logger = Logger.getLogger(UsuarioManagerImpl.class);
+    private PartidaManager pm;
+    private UsuarioDAO usuarioDAO;
 
     public UsuarioManagerImpl() {
+        this.pm = new PartidaManagerImpl();
         this.usuarioDAO = new UsuarioDAOImpl();
     }
 
@@ -93,6 +95,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
             logger.error("No se puede borrar usuario, no encontrado: " + nombreUsu);
             throw new UsuarioNotFoundException(nombreUsu + " no encontrado");
         }
+        this.pm.deletePartidas(nombreUsu);
         usuarioDAO.deleteUsuario(nombreUsu);
         logger.info("Usuario borrado: " + nombreUsu);
     }

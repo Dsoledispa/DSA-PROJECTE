@@ -2,6 +2,8 @@ package edu.upc.dsa.services;
 
 import edu.upc.dsa.manager.CarritoManager;
 import edu.upc.dsa.manager.CarritoManagerImpl;
+import edu.upc.dsa.manager.PartidaManager;
+import edu.upc.dsa.manager.PartidaManagerImpl;
 import edu.upc.dsa.models.Objeto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +24,15 @@ import java.util.List;
 public class CarritoService {
 
     final static Logger logger = Logger.getLogger(CarritoService.class);
-    private final CarritoManager cm = new CarritoManagerImpl();
+    private final CarritoManager cm;
+
+    public CarritoService() {
+        this.cm = new CarritoManagerImpl(new PartidaManagerImpl());
+    }
+
+    public CarritoService(PartidaManager partidaManager){
+        this.cm = new CarritoManagerImpl(partidaManager);
+    }
 
     @Context
     SecurityContext securityContext;

@@ -28,7 +28,7 @@ public class CarritoManagerTest {
 
         this.um = new UsuarioManagerImpl();
         this.pm = new PartidaManagerImpl();
-        this.cm = new CarritoManagerImpl();
+        this.cm = new CarritoManagerImpl(pm);
         this.tm = new TiendaManagerImpl();
         this.im = new InventarioManagerImpl();
         

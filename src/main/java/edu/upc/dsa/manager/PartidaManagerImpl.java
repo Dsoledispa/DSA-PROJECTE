@@ -14,9 +14,13 @@ import java.util.List;
 public class PartidaManagerImpl implements PartidaManager {
 
     final static Logger logger = Logger.getLogger(PartidaManagerImpl.class);
+    private final InventarioManager im;
+    private final CarritoManager cm;
     private final PartidaDAO partidaDAO;
 
     public PartidaManagerImpl() {
+        this.im = new InventarioManagerImpl();
+        this.cm = new CarritoManagerImpl(this);
         this.partidaDAO = new PartidaDAOImpl();
     }
 
@@ -80,6 +84,8 @@ public class PartidaManagerImpl implements PartidaManager {
     public void deletePartida(String id_usuario, String id_partida) {
         Partida partida = this.getPartida(id_usuario, id_partida);
         if (partida != null) {
+            im.eliminarAllObjetosDeInventario(id_partida);
+            cm.vaciarCarrito(id_partida);
             partidaDAO.deletePartida(id_partida);
             logger.info("Partida eliminada: " + partida);
         }
@@ -89,6 +95,8 @@ public class PartidaManagerImpl implements PartidaManager {
     public void deletePartidas(String id_usuario) {
         List<Partida> partidas = this.getPartidas(id_usuario);
         for (Partida p : partidas) {
+            im.eliminarAllObjetosDeInventario(p.getId_partida());
+            cm.vaciarCarrito(p.getId_partida());
             partidaDAO.deletePartida(p.getId_partida());
             logger.info("Partida eliminada: " + p);
         }
