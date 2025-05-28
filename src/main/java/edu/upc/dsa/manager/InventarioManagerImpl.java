@@ -13,14 +13,12 @@ public class InventarioManagerImpl implements InventarioManager {
 
     final static Logger logger = Logger.getLogger(InventarioManagerImpl.class);
 
-    private CatObjetoDAO catObjetoDAO;
+    private TiendaManager tm;
     private final InventarioDAO inventarioDAO;
-    private final ObjetoDAO objetoDAO;
 
     public InventarioManagerImpl() {
+        this.tm = new TiendaManagerImpl();
         this.inventarioDAO = new InventarioDAOImpl();
-        this.objetoDAO = new ObjetoDAOImpl();
-        this.catObjetoDAO = new CatObjetoDAOImpl();
     }
 
     @Override
@@ -29,11 +27,8 @@ public class InventarioManagerImpl implements InventarioManager {
         List<Objeto> objetos = new ArrayList<>();
         for (Inventario inv : registros) {
             logger.info("Que tenemos aqui : " +inv);
-            Objeto obj = objetoDAO.getObjeto(inv.getId_objeto());
+            Objeto obj = tm.getProductoPorId(inv.getId_objeto());
             if (obj != null) {
-                String id_categoria = obj.getCategoria().getId_categoria();
-                CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
-                obj.setCategoria(catObjeto);
                 objetos.add(obj);
             }
         }

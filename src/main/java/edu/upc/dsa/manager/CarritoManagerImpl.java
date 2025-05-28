@@ -10,18 +10,16 @@ import java.util.List;
 public class CarritoManagerImpl implements CarritoManager {
 
     final static Logger logger = Logger.getLogger(CarritoManagerImpl.class);
-    private CatObjetoDAO catObjetoDAO;
+    private TiendaManager tm;
+    private InventarioManager im;
+    private PartidaManager pm;
     private final CarritoDAO carritoDAO;
-    private final ObjetoDAO objetoDAO;
-    private final PartidaDAO partidaDAO;
-    private final InventarioDAO inventarioDAO;
 
     public CarritoManagerImpl() {
-        this.catObjetoDAO = new CatObjetoDAOImpl();
+        this.tm = new TiendaManagerImpl();
+        this.im = new InventarioManagerImpl();
+        this.pm = new PartidaManagerImpl();
         this.carritoDAO = new CarritoDAOImpl();
-        this.objetoDAO = new ObjetoDAOImpl();
-        this.partidaDAO = new PartidaDAOImpl();
-        this.inventarioDAO = new InventarioDAOImpl();
     }
 
     @Override
@@ -53,11 +51,8 @@ public class CarritoManagerImpl implements CarritoManager {
         List<Carrito> registros = carritoDAO.getCarritoByPartida(id_partida);
         List<Objeto> objetos = new ArrayList<>();
         for (Carrito c : registros) {
-            Objeto obj = objetoDAO.getObjeto(c.getId_objeto());
+            Objeto obj = tm.getProductoPorId(c.getId_objeto());
             if (obj != null) {
-                String id_categoria = obj.getCategoria().getId_categoria();
-                CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
-                obj.setCategoria(catObjeto);
                 objetos.add(obj);
             }
         }
@@ -74,8 +69,8 @@ public class CarritoManagerImpl implements CarritoManager {
     }
 
     @Override
-    public boolean realizarCompra(String id_partida) {
-        Partida partida = partidaDAO.getPartida(id_partida);
+    public boolean realizarCompra(String id_usuario, String id_partida) {
+        Partida partida = pm.getPartida(id_usuario, id_partida);
         if (partida == null) {
             logger.warn("Partida no encontrada: " + id_partida);
             return false;
@@ -94,11 +89,10 @@ public class CarritoManagerImpl implements CarritoManager {
         partida.setInventario(objetos);
         for (Objeto objeto : objetos){
             String id_objeto = objeto.getId_objeto();
-            Inventario inventario = new Inventario(null, id_partida, id_objeto);
-            inventarioDAO.addInventario(inventario);
+            im.agregarObjetoAInventario(id_partida, id_objeto);
         }
         logger.info("Que hay en partida: "+partida);
-        partidaDAO.updatePartida(partida);
+        pm.updatePartida(partida);
         carritoDAO.deleteAllFromPartida(id_partida);
 
         logger.info("Compra realizada para partida " + id_partida + ". Monedas restantes: " + partida.getMonedas());

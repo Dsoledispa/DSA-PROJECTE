@@ -114,7 +114,8 @@ public class CarritoService {
     })
     public Response realizarCompra(@PathParam("id_partida") String id_partida) {
         try {
-            boolean resultado = cm.realizarCompra(id_partida);
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            boolean resultado = cm.realizarCompra(id_usuario, id_partida);
             if (resultado) {
                 return Response.ok("{\"message\":\"Compra realizada con éxito\"}").build();
             } else {

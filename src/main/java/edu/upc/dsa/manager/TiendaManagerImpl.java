@@ -1,7 +1,5 @@
 package edu.upc.dsa.manager;
 
-import edu.upc.dsa.db.orm.dao.CatObjetoDAO;
-import edu.upc.dsa.db.orm.dao.CatObjetoDAOImpl;
 import edu.upc.dsa.db.orm.dao.ObjetoDAO;
 import edu.upc.dsa.db.orm.dao.ObjetoDAOImpl;
 import edu.upc.dsa.models.CategoriaObjeto;
@@ -14,11 +12,11 @@ import java.util.Random;
 public class TiendaManagerImpl implements TiendaManager {
 
     final static Logger logger = Logger.getLogger(TiendaManagerImpl.class);
-    private CatObjetoDAO catObjetoDAO;
+    private CatObjetoManager com;
     private final ObjetoDAO objetoDAO;
 
     public TiendaManagerImpl() {
-        this.catObjetoDAO = new CatObjetoDAOImpl();
+        this.com = new CatObjetoManagerImpl();
         this.objetoDAO = new ObjetoDAOImpl();
     }
 
@@ -27,7 +25,7 @@ public class TiendaManagerImpl implements TiendaManager {
         List<Objeto> productos = objetoDAO.getObjetos();
         for (Objeto producto : productos) {
             String id_categoria = producto.getCategoria().getId_categoria();
-            CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+            CategoriaObjeto catObjeto = com.getCatObjeto(id_categoria);
             producto.setCategoria(catObjeto);
         }
         logger.info("Productos: " + productos);
@@ -38,7 +36,7 @@ public class TiendaManagerImpl implements TiendaManager {
     public List<Objeto> getProductosPorCategoria(String id_categoria) {
         List<Objeto> productos = objetoDAO.getObjetosByCategoria(id_categoria);
         for (Objeto producto : productos) {
-            CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+            CategoriaObjeto catObjeto = com.getCatObjeto(id_categoria);
             producto.setCategoria(catObjeto);
         }
         logger.info("Productos por categoría (" + id_categoria + "): " + productos);
@@ -51,7 +49,7 @@ public class TiendaManagerImpl implements TiendaManager {
 
         //Inserto los datos de categoria en el producto
         String id_categoria = producto.getCategoria().getId_categoria();
-        CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+        CategoriaObjeto catObjeto = com.getCatObjeto(id_categoria);
         producto.setCategoria(catObjeto);
 
         logger.info("Producto por id_producto: " + id_producto + " es " + producto);
@@ -70,7 +68,7 @@ public class TiendaManagerImpl implements TiendaManager {
 
         //Inserto los datos de categoria en el productoAleatorio
         String id_categoria = productoAleatorio.getCategoria().getId_categoria();
-        CategoriaObjeto catObjeto = catObjetoDAO.getCategoriaObjeto(id_categoria);
+        CategoriaObjeto catObjeto = com.getCatObjeto(id_categoria);
         productoAleatorio.setCategoria(catObjeto);
 
         logger.info("Producto aleatorio seleccionado: " + productoAleatorio);

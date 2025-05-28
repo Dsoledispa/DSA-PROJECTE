@@ -70,7 +70,7 @@ public class CarritoManagerTest {
         cm.eliminarObjetoDeCarrito("1", pocion.getId_objeto());
 
         // Confirmar compra
-        cm.realizarCompra("1");
+        cm.realizarCompra("carritoTest","1");
 
         // Verificar inventario
         List<Objeto> objetos = im.getInventarioDePartida("1");

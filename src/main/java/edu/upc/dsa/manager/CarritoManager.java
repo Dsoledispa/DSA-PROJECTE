@@ -17,7 +17,7 @@ public interface CarritoManager {
     List<Objeto> getObjetosDelCarrito(String id_partida);
 
     // Realiza la compra: transfiere objetos al inventario si hay suficiente dinero y vacía el carrito
-    boolean realizarCompra(String id_partida);
+    boolean realizarCompra(String id_usuario, String id_partida);
 
     // Vacía el carrito de una partida sin realizar compra (opcional)
     void vaciarCarrito(String id_partida);
