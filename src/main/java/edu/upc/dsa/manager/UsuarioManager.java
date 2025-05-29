@@ -22,6 +22,7 @@ public interface UsuarioManager {
     void updateUsuario(Usuario u);
 
     void deleteUsuario(String nombreUsu);
+    void deleteAllUsuarios();
 
     List<Usuario> getAllUsuarios();
 

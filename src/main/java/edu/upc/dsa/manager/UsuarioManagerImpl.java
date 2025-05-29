@@ -101,6 +101,16 @@ public class UsuarioManagerImpl implements UsuarioManager {
     }
 
     @Override
+    public void deleteAllUsuarios() {
+        List<Usuario> usuarios = usuarioDAO.getUsuarios();
+        for (Usuario u : usuarios){
+            this.pm.deletePartidas(u.getNombreUsu());
+            usuarioDAO.deleteUsuario(u.getNombreUsu());
+        }
+        logger.info("Todos los usuarios borrados");
+    }
+
+    @Override
     public List<Usuario> getAllUsuarios() {
         List<Usuario> usuarios = usuarioDAO.getUsuarios();
         logger.info("getAllUsuarios: " + usuarios);
