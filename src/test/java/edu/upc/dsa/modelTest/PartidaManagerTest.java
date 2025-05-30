@@ -27,88 +27,88 @@ public class PartidaManagerTest {
         this.um = new UsuarioManagerImpl();
         this.pm = new PartidaManagerImpl();
 
-        this.um.addUsuario("UsuarioTest", "1234");
+        this.um.addUsuario("555","UsuarioTest", "1234");
         // Crear una partida inicial para el usuario UsuarioTest
-        pm.addPartida("1", "UsuarioTest", 3, 100, 0);
+        pm.addPartida("1", "555", 3, 100, 0);
     }
 
     @After
     public void tearDown() {
         // Borrar todas las partidas del usuario UsuarioTest
-        List<Partida> partidas = pm.getPartidas("UsuarioTest");
+        List<Partida> partidas = pm.getPartidas("555");
         for (Partida p : partidas) {
-            pm.deletePartida("UsuarioTest", p.getId_partida());
+            pm.deletePartida("555", p.getId_partida());
         }
-        this.um.deleteUsuario("UsuarioTest");
+        this.um.deleteUsuario("555");
     }
 
     @Test
     public void addAndGetPartidaTest() {
         // Verificar cantidad inicial
-        assertEquals(1, pm.sizePartidas("UsuarioTest"));
+        assertEquals(1, pm.sizePartidas("555"));
 
         // Agregar nueva partida
-        pm.addPartida("2", "UsuarioTest", 5, 200, 50);
-        assertEquals(2, pm.sizePartidas("UsuarioTest"));
+        pm.addPartida("2", "555", 5, 200, 50);
+        assertEquals(2, pm.sizePartidas("555"));
 
         // Obtener partida específica
-        Partida partida = pm.getPartida("UsuarioTest", "2");
-        assertEquals("UsuarioTest", partida.getId_usuario());
+        Partida partida = pm.getPartida("555", "2");
+        assertEquals("555", partida.getId_usuario());
         assertEquals(200, partida.getMonedas().intValue());
     }
 
     @Test
     public void addPartidaConSoloUsuarioTest() {
-        Partida nueva = pm.addPartida("UsuarioTest");
+        Partida nueva = pm.addPartida("555");
         assertNotNull(nueva.getId_partida());
-        assertEquals("UsuarioTest", nueva.getId_usuario());
+        assertEquals("555", nueva.getId_usuario());
     }
 
     @Test
     public void getMonedasDePartidaTest() {
-        int monedas = pm.getMonedasDePartida("UsuarioTest", "1");
+        int monedas = pm.getMonedasDePartida("555", "1");
         assertEquals(100, monedas);
     }
 
     @Test
     public void updatePartidaTest() {
-        Partida partida = pm.getPartida("UsuarioTest", "1");
+        Partida partida = pm.getPartida("555", "1");
         partida.setMonedas(999);
         pm.updatePartida(partida);
 
-        Partida actualizada = pm.getPartida("UsuarioTest", "1");
+        Partida actualizada = pm.getPartida("555", "1");
         assertEquals(999, actualizada.getMonedas().intValue());
     }
 
     @Test
     public void deletePartidaTest() {
-        pm.addPartida("3", "UsuarioTest", 3, 50, 0);
-        assertEquals(2, pm.sizePartidas("UsuarioTest"));
+        pm.addPartida("3", "555", 3, 50, 0);
+        assertEquals(2, pm.sizePartidas("555"));
 
-        pm.deletePartida("UsuarioTest", "3");
-        assertEquals(1, pm.sizePartidas("UsuarioTest"));
+        pm.deletePartida("555", "3");
+        assertEquals(1, pm.sizePartidas("555"));
     }
 
     @Test
     public void getPartidasTest() {
-        pm.addPartida("4", "UsuarioTest", 3, 80, 10);
-        pm.addPartida("5", "UsuarioTest", 2, 30, 20);
+        pm.addPartida("4", "555", 3, 80, 10);
+        pm.addPartida("5", "555", 2, 30, 20);
 
-        List<Partida> partidas = pm.getPartidas("UsuarioTest");
+        List<Partida> partidas = pm.getPartidas("555");
         assertEquals(3, partidas.size());
     }
 
     @Test
     public void partidaYaExisteExceptionTest() {
         assertThrows(PartidaYaExisteException.class, () -> {
-            pm.addPartida("1", "UsuarioTest", 3, 100, 0); // misma ID que la inicial
+            pm.addPartida("1", "555", 3, 100, 0); // misma ID que la inicial
         });
     }
 
     @Test
     public void partidaNotFoundExceptionTest() {
         assertThrows(PartidaNotFoundException.class, () -> {
-            pm.getPartida("UsuarioTest", "999"); // no existe
+            pm.getPartida("555", "999"); // no existe
         });
     }
 

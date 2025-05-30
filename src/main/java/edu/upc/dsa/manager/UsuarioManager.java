@@ -11,20 +11,21 @@ public interface UsuarioManager {
 
     // Registrar usuario
     Usuario addUsuario(Usuario u);
-    Usuario addUsuario(String nombreUsu, String password);
-    Usuario comprobarUsuario(String nombreUsu);
+    Usuario addUsuario(String id_usuario, String nombre, String password);
     // Registrar usuario
     // Login
-    Usuario getUsuario(String nombreUsu);
-    Usuario loginUsuario(String nombreUsu, String password);
+    Usuario getUsuario(String id_usuario);
+    Usuario loginUsuario(String nombre, String password);
     // Login
 
     void updateUsuario(Usuario u);
 
-    void deleteUsuario(String nombreUsu);
+    void deleteUsuario(String id_usuario);
     void deleteAllUsuarios();
 
     List<Usuario> getAllUsuarios();
+
+    Usuario getUsuarioPorNombre(String nombre);
 
     int sizeUsuarios();
 

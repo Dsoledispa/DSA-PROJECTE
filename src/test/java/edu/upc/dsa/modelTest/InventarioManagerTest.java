@@ -29,17 +29,17 @@ public class InventarioManagerTest {
         this.im = new InventarioManagerImpl();
         this.tm = new TiendaManagerImpl();
 
-        this.um.addUsuario("inventarioTest", "1234");
-        this.pm.addPartida("10", "inventarioTest", 3, 100, 0);
+        this.um.addUsuario("555","inventarioTest", "1234");
+        this.pm.addPartida("10", "555", 3, 100, 0);
     }
 
     @After
     public void tearDown(){
-        List<Partida> partidas = pm.getPartidas("inventarioTest");
+        List<Partida> partidas = pm.getPartidas("555");
         for (Partida p : partidas) {
-            pm.deletePartida("inventarioTest", p.getId_partida());
+            pm.deletePartida("555", p.getId_partida());
         }
-        this.um.deleteUsuario("inventarioTest");
+        this.um.deleteUsuario("555");
     }
 
     @Test

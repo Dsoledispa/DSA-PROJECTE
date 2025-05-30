@@ -26,7 +26,8 @@ function formulario() {
     }
 
     const datos = {
-      nombreUsu: usuario,
+      id_usuario: null,
+      nombre: usuario,
       password: password
     };
 

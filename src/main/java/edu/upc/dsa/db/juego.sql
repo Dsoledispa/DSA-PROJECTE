@@ -25,7 +25,8 @@ CREATE TABLE objeto (
 
 -- Tabla de usuarios
 CREATE TABLE usuario (
-    nombreUsu VARCHAR(100) PRIMARY KEY,
+    id_usuario VARCHAR(100) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL
 );
 
@@ -36,7 +37,7 @@ CREATE TABLE partida (
     vidas INT,
     monedas INT,
     puntuacion INT,
-    FOREIGN KEY (id_usuario) REFERENCES usuario(nombreUsu)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 -- Tabla inventario (relaciona partida y objeto, permite objetos repetidos)
@@ -57,6 +58,24 @@ CREATE TABLE carrito (
     FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto)
 );
 
+-- Tabla de insignias
+CREATE TABLE insignia (
+    id_insignia VARCHAR(100) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    avatar VARCHAR(255)
+);
+
+-- Tabla intermedia para la relación muchos a muchos entre usuario e insignia (con ID)
+CREATE TABLE usuario_insignia (
+    id_usuario_insignia VARCHAR(100) PRIMARY KEY,
+    id_usuario VARCHAR(100) NOT NULL,
+    id_insignia VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+    FOREIGN KEY (id_insignia) REFERENCES insignia(id_insignia),
+    UNIQUE (id_usuario, id_insignia) -- evita duplicados
+);
+
+
 -- Insertar categorías iniciales
 INSERT INTO categoria_objeto (id_categoria, nombre) VALUES
 ('1', 'ARMAS'),
@@ -69,4 +88,4 @@ INSERT INTO objeto (id_objeto, nombre, precio, imagen, descripcion, id_categoria
 ('2', 'Armadura', 50, '/img/armadura.png', 'Una armadura', '2'),
 ('3', 'Poción', 20, '/img/pocion.png', 'Una pocion', '3');
 
--- Nota: Los usuarios, partidas, inventario y carrito se insertan desde la aplicación
+-- Nota: Los usuarios, partidas, inventario, carrito e insignias se insertan desde la aplicación

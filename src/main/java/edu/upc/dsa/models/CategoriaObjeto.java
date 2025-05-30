@@ -13,11 +13,13 @@ public class CategoriaObjeto {
     @Column(name="nombre")
     private String nombre;
 
-    public CategoriaObjeto() {setId_categoria(RandomUtils.getId());}
+    public CategoriaObjeto() {
+        setId_categoria(RandomUtils.getId());
+    }
 
     public CategoriaObjeto(String id_categoria, String nombre) {
-        this(); // Llama al constructor sin parámetros (asigna un id aleatorio).        if (id_categoria != null) setId_categoria(id_categoria);
-        setId_categoria(id_categoria);
+        this(); // Llama al constructor sin parámetros (asigna un id aleatorio).
+        if (id_categoria != null) setId_categoria(id_categoria);
         setNombre(nombre);
     }
 
@@ -25,7 +27,6 @@ public class CategoriaObjeto {
     public void setId_categoria(String id_categoria) {this.id_categoria = id_categoria;}
 
     public String getNombre() {return nombre;}
-
     public void setNombre(String nombre) {this.nombre = nombre;}
 
     @Override

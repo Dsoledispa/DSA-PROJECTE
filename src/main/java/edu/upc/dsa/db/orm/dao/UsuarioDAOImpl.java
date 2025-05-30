@@ -6,6 +6,7 @@ import edu.upc.dsa.models.Usuario;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class UsuarioDAOImpl implements UsuarioDAO {
@@ -20,7 +21,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             session = FactorySession.openSession();
             session.save(usuario);
             result = 1;
-            logger.info("Usuario guardado en la base de datos: " + usuario.getNombreUsu());
+            logger.info("Usuario con id: "+usuario.getId_usuario()+" guardado: " + usuario.getNombre());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -30,12 +31,29 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
-    public Usuario getUsuario(String nombreUsu) {
+    public Usuario getUsuario(String id_usuario) {
         Session session = null;
         Usuario usuario = null;
         try {
             session = FactorySession.openSession();
-            usuario = (Usuario) session.get(Usuario.class, nombreUsu);
+            usuario = (Usuario) session.get(Usuario.class, id_usuario);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) session.close();
+        }
+        return usuario;
+    }
+
+    @Override
+    public Usuario getUsuarioPorNombre(String nombre) {
+        Session session = null;
+        Usuario usuario = null;
+        try {
+            session = FactorySession.openSession();
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("nombre", nombre);
+            usuario = (Usuario) session.get(Usuario.class, params);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -50,7 +68,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         try {
             session = FactorySession.openSession();
             session.update(usuario);
-            logger.info("Usuario actualizado: " + usuario.getNombreUsu());
+            logger.info("Usuario con id: "+usuario.getId_usuario()+" actualizado: " + usuario.getNombre());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -59,10 +77,10 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     }
 
     @Override
-    public void deleteUsuario(String nombreUsu) {
+    public void deleteUsuario(String id_usuario) {
         Session session = null;
         try {
-            Usuario usuario = this.getUsuario(nombreUsu);
+            Usuario usuario = this.getUsuario(id_usuario);
             if (usuario != null) {
                 session = FactorySession.openSession();
                 session.delete(usuario);

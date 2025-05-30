@@ -33,8 +33,8 @@ public class CarritoManagerTest {
         this.im = new InventarioManagerImpl();
         
         // Crear usuario y partida con monedas suficientes
-        this.um.addUsuario("carritoTest", "1234");
-        pm.addPartida("1", "carritoTest", 3, 200, 0);
+        this.um.addUsuario("555","carritoTest", "1234");
+        pm.addPartida("1", "555", 3, 200, 0);
     }
 
     @After
@@ -43,11 +43,11 @@ public class CarritoManagerTest {
         im.eliminarAllObjetosDeInventario("1");
 
         // Borrar todas las partidas del usuario UsuarioTest
-        List<Partida> partidas = pm.getPartidas("carritoTest");
+        List<Partida> partidas = pm.getPartidas("555");
         for (Partida p : partidas) {
-            pm.deletePartida("carritoTest", p.getId_partida());
+            pm.deletePartida("555", p.getId_partida());
         }
-        this.um.deleteUsuario("carritoTest");
+        this.um.deleteUsuario("555");
     }
 
     @Test
@@ -70,7 +70,7 @@ public class CarritoManagerTest {
         cm.eliminarObjetoDeCarrito("1", pocion.getId_objeto());
 
         // Confirmar compra
-        cm.realizarCompra("carritoTest","1");
+        cm.realizarCompra("555","1");
 
         // Verificar inventario
         List<Objeto> objetos = im.getInventarioDePartida("1");
@@ -79,7 +79,7 @@ public class CarritoManagerTest {
         assertEquals(2, objetos.size());
 
         // Verificar monedas restantes
-        Partida partidaActualizada = pm.getPartida("carritoTest", "1");
+        Partida partidaActualizada = pm.getPartida("555", "1");
         int esperado = 200 - espada.getPrecio() - armadura.getPrecio(); // 200 - 30 - 50 = 120
         assertEquals(esperado,(int) partidaActualizada.getMonedas());
 

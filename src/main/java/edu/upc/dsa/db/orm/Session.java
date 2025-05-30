@@ -6,6 +6,7 @@ import java.util.List;
 public interface Session {
     void save(Object entity);                                           // Crud
     Object get(Class theClass, Object ID);
+    Object get(Class theClass, HashMap<String, Object> params);
     List<Object> findAll(Class theClass);                               // cR
     List<Object> findAll(Class theClass, HashMap<String, Object> params);// cRud
     void update(Object object);                                         // crUd

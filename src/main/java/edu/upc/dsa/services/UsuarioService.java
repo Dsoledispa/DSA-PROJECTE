@@ -31,7 +31,7 @@ public class UsuarioService {
     // Generar token JWT
     private String generateToken(Usuario u) {
         return Jwts.builder()
-                .setSubject(u.getNombreUsu())
+                .setSubject(u.getId_usuario())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -39,7 +39,7 @@ public class UsuarioService {
     }
 
     @POST
-    @Operation(summary = "Registrar usuario", description = "Crea un nuevo usuario")
+    @Operation(summary = "Registrar usuario (solo usar nombre y password)", description = "Crea un nuevo usuario")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuario registrado"),
             @ApiResponse(responseCode = "409", description = "Usuario ya existe")
@@ -49,16 +49,19 @@ public class UsuarioService {
     public Response newUsuario(Usuario u) {
         try {
             this.um.addUsuario(u);
-            logger.info("Usuario registrado: " + u.getNombreUsu());
+            logger.info("Usuario registrado: " + u.getNombre());
             return Response.status(201).entity("{\"mensaje\":\"Usuario registrado correctamente\"}").build();
         } catch (UsuarioYaExisteException e) {
-            logger.warn("Intento de registrar usuario ya existente: " + u.getNombreUsu());
+            logger.warn("Intento de registrar usuario ya existente: " + u.getNombre());
             return Response.status(409).entity("{\"error\":\"Usuario ya existe\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al registrar usuario", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al registrar usuario\"}").build();
         }
     }
 
     @POST
-    @Operation(summary = "Login usuario", description = "Inicio de sesión y obtención de token JWT")
+    @Operation(summary = "Login usuario (solo usar nombre y password)", description = "Inicio de sesión y obtención de token JWT")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Login correcto, token devuelto"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
@@ -67,15 +70,18 @@ public class UsuarioService {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response loginUsuario(Usuario u){
+    public Response loginUsuario(Usuario u) {
         try {
-            Usuario usuarioLogueado = this.um.loginUsuario(u.getNombreUsu(), u.getPassword());
+            Usuario usuarioLogueado = this.um.loginUsuario(u.getNombre(), u.getPassword());
             String token = generateToken(usuarioLogueado);
             return Response.status(201).entity("{\"token\":\"" + token + "\"}").build();
         } catch (UsuarioNotFoundException e) {
             return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
         } catch (PasswordNotMatchException e) {
             return Response.status(401).entity("{\"error\":\"Contraseña incorrecta\"}").build();
+        } catch (Exception e) {
+            logger.error("Error en login", e);
+            return Response.serverError().entity("{\"error\":\"Error interno en login\"}").build();
         }
     }
 
@@ -86,8 +92,33 @@ public class UsuarioService {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsuarios() {
-        List<Usuario> usuarios = this.um.getAllUsuarios();
-        return Response.ok(usuarios).build();
+        try {
+            List<Usuario> usuarios = this.um.getAllUsuarios();
+            return Response.ok(usuarios).build();
+        } catch (Exception e) {
+            logger.error("Error al obtener todos los usuarios", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al obtener usuarios\"}").build();
+        }
+    }
+
+    @GET
+    @Operation(summary = "Obtener usuario por ID", description = "Devuelve el usuario que coincide con el ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @Path("/{id_usuario}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsuario(@PathParam("id_usuario") String id_usuario) {
+        try {
+            Usuario u = this.um.getUsuario(id_usuario);
+            return Response.ok(u).build();
+        } catch (UsuarioNotFoundException e) {
+            return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al obtener usuario por ID", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al obtener usuario\"}").build();
+        }
     }
 
     @GET
@@ -96,14 +127,18 @@ public class UsuarioService {
             @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
-    @Path("/{nombreUsu}")
+    @Path("/nombre/{nombre}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsuario(@PathParam("nombreUsu") String nombreUsu) {
+    public Response getUsuarioPorNombre(@PathParam("nombre") String nombre) {
         try {
-            Usuario u = this.um.getUsuario(nombreUsu);
+            Usuario u = this.um.getUsuarioPorNombre(nombre);
+            if (u == null) throw new UsuarioNotFoundException("Usuario no encontrado");
             return Response.ok(u).build();
         } catch (UsuarioNotFoundException e) {
             return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al obtener usuario por nombre", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al obtener usuario\"}").build();
         }
     }
 
@@ -120,6 +155,9 @@ public class UsuarioService {
             return Response.ok("{\"mensaje\":\"Usuario actualizado\"}").build();
         } catch (UsuarioNotFoundException e) {
             return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al actualizar usuario", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al actualizar usuario\"}").build();
         }
     }
 
@@ -130,13 +168,28 @@ public class UsuarioService {
             @ApiResponse(responseCode = "200", description = "Usuario eliminado"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
-    @Path("/{nombreUsu}")
-    public Response deleteUsuario(@PathParam("nombreUsu") String nombreUsu) {
+    @Path("/{id_usuario}")
+    public Response deleteUsuario(@PathParam("id_usuario") String id_usuario) {
         try {
-            this.um.deleteUsuario(nombreUsu);
+            this.um.deleteUsuario(id_usuario);
             return Response.ok("{\"mensaje\":\"Usuario eliminado\"}").build();
         } catch (UsuarioNotFoundException e) {
             return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
+        }
+    }
+
+    @DELETE
+    @Operation(summary = "Eliminar todos los usuarios", description = "Elimina todos los usuarios del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Todos los usuarios eliminados")
+    })
+    public Response deleteAllUsuarios() {
+        try {
+            this.um.deleteAllUsuarios();
+            return Response.ok("{\"mensaje\":\"Todos los usuarios eliminados\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al eliminar todos los usuarios", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al eliminar usuarios\"}").build();
         }
     }
 }

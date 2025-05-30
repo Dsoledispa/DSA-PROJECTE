@@ -95,6 +95,64 @@ public class SessionImpl implements Session {
         return null;
     }
 
+    @Override
+    public Object get(Class theClass, HashMap<String, Object> params) {
+        PreparedQuery queryObj = QueryHelper.createSelectFindAllWithParams(theClass, params);
+        String query = queryObj.sql;
+        List<String> orderedKeys = queryObj.columns;
+
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
+            int i = 1;
+            for (String key : orderedKeys) {
+                pstm.setObject(i++, params.get(key));
+            }
+
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                Object entity = theClass.getDeclaredConstructor().newInstance();
+
+                for (Field field : theClass.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Ignore.class)) continue;
+
+                    String columnName = field.getName();
+                    if (field.isAnnotationPresent(Column.class)) {
+                        columnName = field.getAnnotation(Column.class).name();
+                    } else if (field.isAnnotationPresent(JoinColumn.class)) {
+                        columnName = field.getAnnotation(JoinColumn.class).name();
+                    }
+
+                    Object value = rs.getObject(columnName);
+                    field.setAccessible(true);
+
+                    if (field.isAnnotationPresent(JoinColumn.class)) {
+                        Class<?> relatedType = field.getType();
+                        Object relatedInstance = relatedType.getDeclaredConstructor().newInstance();
+
+                        for (Field f : relatedType.getDeclaredFields()) {
+                            if (f.isAnnotationPresent(Id.class)) {
+                                f.setAccessible(true);
+                                f.set(relatedInstance, value);
+                                break;
+                            }
+                        }
+
+                        field.set(entity, relatedInstance);
+                    } else {
+                        field.set(entity, value);
+                    }
+                }
+                return entity;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
 
     @Override
     public List<Object> findAll(Class theClass) {

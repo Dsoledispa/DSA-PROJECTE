@@ -23,11 +23,11 @@ public class JWTAuthFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String path = requestContext.getUriInfo().getPath();
 
-        // Excluir las siguientes rutas del filtro"
+        // Excluir rutas públicas
         if (path.equals("usuarios/login") || path.equals("usuarios/register")) {
             return;
         }
-        // Excluir rutas de swagger, api-docs, wadl, etc
+        // Excluir rutas de Swagger, OpenAPI, etc.
         if (path.startsWith("swagger") ||
                 path.equals("swagger.json") ||
                 path.equals("application.wadl") ||
@@ -56,14 +56,14 @@ public class JWTAuthFilter implements ContainerRequestFilter {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String username = claims.getSubject();
+            String userId = claims.getSubject();
 
             final SecurityContext currentSecurityContext = requestContext.getSecurityContext();
 
             requestContext.setSecurityContext(new SecurityContext() {
                 @Override
                 public Principal getUserPrincipal() {
-                    return () -> username;
+                    return () -> userId;
                 }
 
                 @Override
