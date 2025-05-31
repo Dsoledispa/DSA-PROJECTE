@@ -17,10 +17,12 @@ public class UsuarioManagerImpl implements UsuarioManager {
 
     final static Logger logger = Logger.getLogger(UsuarioManagerImpl.class);
     private PartidaManager pm;
+    Usuario_InsigniaManager uim;
     private UsuarioDAO usuarioDAO;
 
     public UsuarioManagerImpl() {
         this.pm = new PartidaManagerImpl();
+        this.uim = new Usuario_InsigniaManagerImpl();
         this.usuarioDAO = new UsuarioDAOImpl();
     }
 
@@ -107,6 +109,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
             throw new UsuarioNotFoundException("Usuario con id :" +id_usuario + " no encontrado");
         }
         this.pm.deletePartidas(id_usuario);
+        this.uim.eliminarTodasInsigniasDeUsuario(id_usuario);
         usuarioDAO.deleteUsuario(id_usuario);
         logger.info("Usuario borrado: " + u.getNombre());
     }
@@ -116,6 +119,7 @@ public class UsuarioManagerImpl implements UsuarioManager {
         List<Usuario> usuarios = usuarioDAO.getUsuarios();
         for (Usuario u : usuarios){
             this.pm.deletePartidas(u.getId_usuario());
+            this.uim.eliminarTodasInsigniasDeUsuario(u.getId_usuario());
             usuarioDAO.deleteUsuario(u.getId_usuario());
         }
         logger.info("Todos los usuarios borrados");

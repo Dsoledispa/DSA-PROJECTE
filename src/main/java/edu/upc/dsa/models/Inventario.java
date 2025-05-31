@@ -17,14 +17,14 @@ public class Inventario {
     private String id_objeto;
 
     public Inventario() {
-        this.id_inventario = RandomUtils.getId();
+        setId_inventario(RandomUtils.getId());
     }
 
     public Inventario(String id_inventario, String id_partida, String id_objeto) {
         this(); // genera id aleatorio
         if (id_inventario != null) setId_inventario(id_inventario);
-        this.id_partida = id_partida;
-        this.id_objeto = id_objeto;
+        setId_partida(id_partida);
+        setId_objeto(id_objeto);
     }
 
     public String getId_inventario() { return id_inventario; }

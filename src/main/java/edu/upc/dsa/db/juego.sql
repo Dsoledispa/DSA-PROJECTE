@@ -26,7 +26,7 @@ CREATE TABLE objeto (
 -- Tabla de usuarios
 CREATE TABLE usuario (
     id_usuario VARCHAR(100) PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL
 );
 
@@ -88,4 +88,10 @@ INSERT INTO objeto (id_objeto, nombre, precio, imagen, descripcion, id_categoria
 ('2', 'Armadura', 50, '/img/armadura.png', 'Una armadura', '2'),
 ('3', 'Poción', 20, '/img/pocion.png', 'Una pocion', '3');
 
--- Nota: Los usuarios, partidas, inventario, carrito e insignias se insertan desde la aplicación
+-- Insertar insignias iniciales
+INSERT INTO insignia (id_insignia, nombre, avatar) VALUES
+('1', 'Policia', '/img/policia.webp'),
+('2', 'Tornillo', '/img/tornillo.jpg'),
+('3', 'Valor', '/img/valor.png');
+
+-- Nota: Los usuarios, partidas, inventario, carrito se insertan desde la aplicación

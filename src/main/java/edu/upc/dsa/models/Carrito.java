@@ -1,10 +1,7 @@
 package edu.upc.dsa.models;
 
 import edu.upc.dsa.util.RandomUtils;
-import edu.upc.dsa.util.annotations.Column;
-import edu.upc.dsa.util.annotations.Id;
-import edu.upc.dsa.util.annotations.JoinColumn;
-import edu.upc.dsa.util.annotations.Table;
+import edu.upc.dsa.util.annotations.*;
 
 @Table(name = "carrito")
 public class Carrito {
