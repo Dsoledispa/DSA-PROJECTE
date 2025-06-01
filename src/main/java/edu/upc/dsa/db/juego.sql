@@ -84,6 +84,17 @@ CREATE TABLE consulta (
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
 );
 
+-- Tabla de denuncia
+CREATE TABLE denuncia (
+    id_denuncia VARCHAR(100) PRIMARY KEY,
+    fecha DATETIME NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    mensaje TEXT NOT NULL,
+    id_usuario VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
+
+);
+
 
 -- Insertar categorías iniciales
 INSERT INTO categoria_objeto (id_categoria, nombre) VALUES

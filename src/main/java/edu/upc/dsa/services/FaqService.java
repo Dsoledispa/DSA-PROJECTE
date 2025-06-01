@@ -18,10 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Path("/faqs")
-@Tag(name = "faqs", description = "Servicio de FAQs")
+@Tag(name = "Faqs", description = "Servicio de FAQs")
 public class FaqService {
 
     final static Logger logger = Logger.getLogger(FaqService.class);
+
+    public FaqService(){
+        // Constructor vacío
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
