@@ -11,11 +11,9 @@ import java.util.List;
 public class InsigniaManagerImpl implements InsigniaManager {
 
     final static Logger logger = Logger.getLogger(InsigniaManagerImpl.class);
-    Usuario_InsigniaManager uim;
     private InsigniaDAO insigniaDAO;
 
     public InsigniaManagerImpl() {
-        this.uim = new Usuario_InsigniaManagerImpl();
         this.insigniaDAO = new InsigniaDAOImpl();
     }
 
@@ -75,7 +73,6 @@ public class InsigniaManagerImpl implements InsigniaManager {
             logger.warn("Intento de borrar insignia inexistente con id: " + id_insignia);
             return;
         }
-        this.uim.eliminarUsuariosConInsignia(id_insignia);
         insigniaDAO.deleteInsignia(id_insignia);
         logger.info("Insignia borrada: " + ins.getNombre());
     }
@@ -84,7 +81,6 @@ public class InsigniaManagerImpl implements InsigniaManager {
     public void deleteAllInsignias() {
         List<Insignia> todas = insigniaDAO.getInsignias();
         for (Insignia i : todas) {
-            this.uim.eliminarUsuariosConInsignia(i.getId_insignia());
             insigniaDAO.deleteInsignia(i.getId_insignia());
         }
         logger.info("Todas las insignias han sido eliminadas");

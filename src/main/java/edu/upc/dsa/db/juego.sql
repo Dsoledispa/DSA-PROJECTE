@@ -20,7 +20,7 @@ CREATE TABLE objeto (
     imagen VARCHAR(255),
     descripcion TEXT,
     id_categoria VARCHAR(100) NOT NULL,
-    FOREIGN KEY (id_categoria) REFERENCES categoria_objeto(id_categoria)
+    FOREIGN KEY (id_categoria) REFERENCES categoria_objeto(id_categoria) ON DELETE CASCADE
 );
 
 -- Tabla de usuarios
@@ -37,7 +37,7 @@ CREATE TABLE partida (
     vidas INT,
     monedas INT,
     puntuacion INT,
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
 );
 
 -- Tabla inventario (relaciona partida y objeto, permite objetos repetidos)
@@ -45,8 +45,8 @@ CREATE TABLE inventario (
     id_inventario VARCHAR(100) PRIMARY KEY,
     id_partida VARCHAR(100) NOT NULL,
     id_objeto VARCHAR(100) NOT NULL,
-    FOREIGN KEY (id_partida) REFERENCES partida(id_partida),
-    FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto)
+    FOREIGN KEY (id_partida) REFERENCES partida(id_partida) ON DELETE CASCADE,
+    FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto) ON DELETE CASCADE
 );
 
 -- Tabla carrito (objetos temporales por partida)
@@ -54,8 +54,8 @@ CREATE TABLE carrito (
     id_carrito VARCHAR(100) PRIMARY KEY,
     id_partida VARCHAR(100) NOT NULL,
     id_objeto VARCHAR(100) NOT NULL,
-    FOREIGN KEY (id_partida) REFERENCES partida(id_partida),
-    FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto)
+    FOREIGN KEY (id_partida) REFERENCES partida(id_partida) ON DELETE CASCADE,
+    FOREIGN KEY (id_objeto) REFERENCES objeto(id_objeto) ON DELETE CASCADE
 );
 
 -- Tabla de insignias
@@ -70,8 +70,8 @@ CREATE TABLE usuario_insignia (
     id_usuario_insignia VARCHAR(100) PRIMARY KEY,
     id_usuario VARCHAR(100) NOT NULL,
     id_insignia VARCHAR(100) NOT NULL,
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
-    FOREIGN KEY (id_insignia) REFERENCES insignia(id_insignia),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_insignia) REFERENCES insignia(id_insignia) ON DELETE CASCADE,
     UNIQUE (id_usuario, id_insignia) -- evita duplicados
 );
 

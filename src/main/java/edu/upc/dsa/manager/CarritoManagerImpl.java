@@ -15,10 +15,10 @@ public class CarritoManagerImpl implements CarritoManager {
     private PartidaManager pm;
     private final CarritoDAO carritoDAO;
 
-    public CarritoManagerImpl(PartidaManager partidaManager) {
+    public CarritoManagerImpl() {
         this.tm = new TiendaManagerImpl();
         this.im = new InventarioManagerImpl();
-        this.pm = partidaManager;
+        this.pm = new PartidaManagerImpl();
         this.carritoDAO = new CarritoDAOImpl();
     }
 

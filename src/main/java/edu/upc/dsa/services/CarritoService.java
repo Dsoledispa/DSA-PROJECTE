@@ -24,15 +24,7 @@ import java.util.List;
 public class CarritoService {
 
     final static Logger logger = Logger.getLogger(CarritoService.class);
-    private final CarritoManager cm;
-
-    public CarritoService() {
-        this.cm = new CarritoManagerImpl(new PartidaManagerImpl());
-    }
-
-    public CarritoService(PartidaManager partidaManager){
-        this.cm = new CarritoManagerImpl(partidaManager);
-    }
+    private final CarritoManager cm = new CarritoManagerImpl();
 
     @Context
     SecurityContext securityContext;
