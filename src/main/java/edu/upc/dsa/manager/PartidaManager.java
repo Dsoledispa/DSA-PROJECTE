@@ -7,7 +7,6 @@ import java.util.List;
 public interface PartidaManager {
 
     //Funciona como crear partida
-    //id_usuario es el nombre del usuario
     //Es el que finalmente crea
     Partida addPartida(Partida p);
     //Es para tests

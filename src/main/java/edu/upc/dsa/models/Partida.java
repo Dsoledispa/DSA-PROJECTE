@@ -26,12 +26,8 @@ public class Partida {
     @Column(name = "puntuacion")
     private Integer puntuacion;
 
-    @Ignore
-    private List<Objeto> inventario;
-
     public Partida() {
         setId_partida(RandomUtils.getId());
-        inventario = new ArrayList<>();
     }
 
     public Partida(String id_partida, String id_usuario, Integer vidas, Integer monedas, Integer puntuacion) {
@@ -58,13 +54,10 @@ public class Partida {
     public Integer getPuntuacion() { return puntuacion; }
     public void setPuntuacion(Integer puntuacion) { this.puntuacion = puntuacion; }
 
-    public List<Objeto> getInventario() { return inventario; }
-    public void setInventario(List<Objeto> inventario) { this.inventario = inventario; }
-
     @Override
     public String toString() {
         return "Partida [id_partida=" + id_partida + ", id_usuario=" + id_usuario + ", vidas=" + vidas +
-                ", monedas=" + monedas + ", puntuacion=" + puntuacion + ", inventario=" + inventario + "]";
+                ", monedas=" + monedas + ", puntuacion=" + puntuacion + "]";
     }
 
 }

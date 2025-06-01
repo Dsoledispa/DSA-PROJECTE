@@ -12,6 +12,7 @@ import edu.upc.dsa.util.annotations.Ignore;
 
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class SessionImpl implements Session {
@@ -84,6 +85,9 @@ public class SessionImpl implements Session {
 
                         field.set(entity, relatedInstance);
                     } else {
+                        if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                            value = ((Timestamp) value).toLocalDateTime();
+                        }
                         field.set(entity, value);
                     }
                 }
@@ -139,6 +143,9 @@ public class SessionImpl implements Session {
 
                         field.set(entity, relatedInstance);
                     } else {
+                        if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                            value = ((Timestamp) value).toLocalDateTime();
+                        }
                         field.set(entity, value);
                     }
                 }
@@ -182,22 +189,22 @@ public class SessionImpl implements Session {
                     field.setAccessible(true);
 
                     if (field.isAnnotationPresent(JoinColumn.class)) {
-                        // Campo de tipo entidad relacionada (FK)
-                        Class<?> fieldType = field.getType(); // CategoriaObjeto
-                        Object joinObject = fieldType.getDeclaredConstructor().newInstance();
+                        Class<?> relatedType = field.getType();
+                        Object relatedInstance = relatedType.getDeclaredConstructor().newInstance();
 
-                        // Buscamos el campo con la anotación @Id en esa clase y le ponemos el valor
-                        for (Field f : fieldType.getDeclaredFields()) {
+                        for (Field f : relatedType.getDeclaredFields()) {
                             if (f.isAnnotationPresent(Id.class)) {
                                 f.setAccessible(true);
-                                f.set(joinObject, value); // setId_categoria("1")
+                                f.set(relatedInstance, value);
                                 break;
                             }
                         }
 
-                        field.set(entity, joinObject); // asignamos CategoriaObjeto con id seteado
+                        field.set(entity, relatedInstance);
                     } else {
-                        // Campo simple
+                        if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                            value = ((Timestamp) value).toLocalDateTime();
+                        }
                         field.set(entity, value);
                     }
 
@@ -258,6 +265,9 @@ public class SessionImpl implements Session {
 
                         field.set(entity, relatedInstance);
                     } else {
+                        if (field.getType().equals(LocalDateTime.class) && value instanceof Timestamp) {
+                            value = ((Timestamp) value).toLocalDateTime();
+                        }
                         field.set(entity, value);
                     }
                 }

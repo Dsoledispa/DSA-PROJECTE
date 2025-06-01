@@ -86,7 +86,6 @@ public class CarritoManagerImpl implements CarritoManager {
 
         // Realizar la compra
         partida.setMonedas(partida.getMonedas() - total);
-        partida.setInventario(objetos);
         for (Objeto objeto : objetos){
             String id_objeto = objeto.getId_objeto();
             im.agregarObjetoAInventario(id_partida, id_objeto);

@@ -74,6 +74,15 @@ CREATE TABLE usuario_insignia (
     FOREIGN KEY (id_insignia) REFERENCES insignia(id_insignia) ON DELETE CASCADE,
     UNIQUE (id_usuario, id_insignia) -- evita duplicados
 );
+-- Tabla de consultas
+CREATE TABLE consulta (
+    id_consulta VARCHAR(100) PRIMARY KEY,
+    fecha DATETIME NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
+    mensaje TEXT NOT NULL,
+    id_usuario VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
+);
 
 
 -- Insertar categorías iniciales
