@@ -78,6 +78,34 @@ public class InventarioService {
         }
     }
 
+    @POST
+    @Path("/aleatorio/{id_partida}/{id_objeto}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Comprar un objeto aleatorio y guardarlo en el inventario",
+            description = "Resta monedas de la partida y guarda el objeto aleatorio comprado en el inventario",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Objeto comprado y añadido al inventario"),
+            @ApiResponse(responseCode = "400", description = "Fondos insuficientes o partida no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno al procesar la compra")
+    })
+    public Response comprarObjetoAleatorio(@PathParam("id_partida") String id_partida, @PathParam("id_objeto") String id_objeto) {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            boolean success = im.PagarYGuardarObjetoInventario(id_usuario, id_partida, id_objeto);
+            if (success) {
+                return Response.ok("{\"message\":\"Compra realizada y objeto añadido al inventario\"}").build();
+            } else {
+                return Response.status(400).entity("{\"error\":\"No se pudo completar la compra\"}").build();
+            }
+        } catch (Exception e) {
+            logger.error("Error al realizar la compra de objeto", e);
+            return Response.status(500).entity("{\"error\":\"Error al realizar la compra\"}").build();
+        }
+    }
+
     @DELETE
     @Path("/{id_partida}/{id_objeto}")
     @Produces(MediaType.APPLICATION_JSON)

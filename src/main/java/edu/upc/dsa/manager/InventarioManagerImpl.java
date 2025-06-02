@@ -4,6 +4,7 @@ import edu.upc.dsa.db.orm.dao.*;
 import edu.upc.dsa.models.CategoriaObjeto;
 import edu.upc.dsa.models.Inventario;
 import edu.upc.dsa.models.Objeto;
+import edu.upc.dsa.models.Partida;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -14,10 +15,12 @@ public class InventarioManagerImpl implements InventarioManager {
     final static Logger logger = Logger.getLogger(InventarioManagerImpl.class);
 
     private TiendaManager tm;
+    private PartidaManager pm;
     private final InventarioDAO inventarioDAO;
 
     public InventarioManagerImpl() {
         this.tm = new TiendaManagerImpl();
+        this.pm = new PartidaManagerImpl();
         this.inventarioDAO = new InventarioDAOImpl();
     }
 
@@ -47,6 +50,29 @@ public class InventarioManagerImpl implements InventarioManager {
             logger.warn("No se pudo añadir el objeto " + id_objeto + " al inventario de partida " + id_partida);
             return false;
         }
+    }
+
+    @Override
+    public boolean PagarYGuardarObjetoInventario(String id_usuario, String id_partida, String id_objeto) {
+        Partida partida = pm.getPartida(id_usuario, id_partida);
+        if (partida == null) {
+            logger.warn("Partida no encontrada: " + id_partida);
+            return false;
+        }
+
+        Objeto objeto = tm.getProductoPorId(id_objeto);
+        if (partida.getMonedas() < objeto.getPrecio()) {
+            logger.info("Fondos insuficientes para compra en partida " + id_partida + ": " + partida.getMonedas() + " < " + objeto.getPrecio());
+            return false;
+        }
+
+        // Realizar la compra
+        partida.setMonedas(partida.getMonedas() - objeto.getPrecio());
+        agregarObjetoAInventario(id_partida, id_objeto);
+        pm.updatePartida(partida);
+
+        logger.info("Compra realizada para partida " + id_partida + ". Monedas restantes: " + partida.getMonedas());
+        return true;
     }
 
     @Override

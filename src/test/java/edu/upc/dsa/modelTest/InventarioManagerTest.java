@@ -87,4 +87,15 @@ public class InventarioManagerTest {
         im.eliminarObjetoDeInventario("10", armadura.getId_objeto());
         im.eliminarObjetoDeInventario("10", pocion.getId_objeto());
     }
+
+    @Test
+    public void testPagarYGuardarObjetoInventario() {
+        Objeto objeto = tm.getProductoAleatorio();
+        im.PagarYGuardarObjetoInventario("555", "10", objeto.getId_objeto());
+
+        // Eliminar objeto
+        boolean eliminado = im.eliminarObjetoDeInventario("10", objeto.getId_objeto());
+        assertTrue(eliminado);
+
+    }
 }

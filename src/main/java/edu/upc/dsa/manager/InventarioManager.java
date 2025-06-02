@@ -12,6 +12,8 @@ public interface InventarioManager {
     // Agrega un objeto al inventario de una partida
     boolean agregarObjetoAInventario(String id_partida, String id_objeto);
 
+    boolean PagarYGuardarObjetoInventario(String id_usuario, String id_partida, String id_objeto);
+
     // Elimina un objeto del inventario de una partida
     boolean eliminarObjetoDeInventario(String id_partida, String id_objeto);
 
