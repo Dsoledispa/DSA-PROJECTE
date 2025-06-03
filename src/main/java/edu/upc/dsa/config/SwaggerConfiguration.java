@@ -14,8 +14,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 description = "Documentación generada con Swagger"
         ),
         servers = {
-                @Server(url = "http://localhost:8080/dsaApp"),
-                @Server(url = "http://dsa1.upc.edu/dsaApp")
+                @Server(url = "https://dsa1.upc.edu/dsaApp")
         },
         security = @SecurityRequirement(name = "bearerAuth")
 )

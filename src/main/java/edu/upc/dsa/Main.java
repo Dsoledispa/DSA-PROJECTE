@@ -9,7 +9,7 @@ import java.net.URI;
 
 public class Main {
 
-    public static final String BASE_URI = "http://0.0.0.0:8080/dsaApp/";
+    public static final String BASE_URI = "http://192.168.10.92:8080/dsaApp/";
 
     public static HttpServer startServer() {
         // Configura Jersey con la clase AppConfig
