@@ -47,6 +47,7 @@ public class UsuarioService {
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response newUsuario(Usuario u) {
+        logger.info("Que tenemos de usuario : " +u);
         try {
             this.um.addUsuario(u);
             logger.info("Usuario registrado: " + u.getNombre());
