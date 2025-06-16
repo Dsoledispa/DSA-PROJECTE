@@ -1,25 +1,38 @@
 package edu.upc.dsa.manager;
 
+import edu.upc.dsa.db.orm.dao.InsigniaDAO;
+import edu.upc.dsa.db.orm.dao.InsigniaDAOImpl;
 import edu.upc.dsa.db.orm.dao.Usuario_InsigniaDAO;
 import edu.upc.dsa.db.orm.dao.Usuario_InsigniaDAOImpl;
+import edu.upc.dsa.models.Insignia;
 import edu.upc.dsa.models.Usuario_Insignia;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Usuario_InsigniaManagerImpl implements Usuario_InsigniaManager {
 
     final static Logger logger = Logger.getLogger(Usuario_InsigniaManagerImpl.class);
 
+    private InsigniaDAO insigniaDAO;
     private final Usuario_InsigniaDAO usuarioInsigniaDAO;
 
     public Usuario_InsigniaManagerImpl() {
+        this.insigniaDAO = new InsigniaDAOImpl();
         this.usuarioInsigniaDAO = new Usuario_InsigniaDAOImpl();
     }
 
     @Override
-    public List<Usuario_Insignia> getInsigniasDeUsuario(String id_usuario) {
-        List<Usuario_Insignia> insignias = usuarioInsigniaDAO.getByUsuario(id_usuario);
+    public List<Insignia> getInsigniasDeUsuario(String id_usuario) {
+        List<Insignia> insignias = new ArrayList<>();
+        List<Usuario_Insignia> User_Insignia = usuarioInsigniaDAO.getByUsuario(id_usuario);
+        for (Usuario_Insignia ui : User_Insignia) {
+            Insignia ins = insigniaDAO.getInsignia(ui.getId_insignia());
+            if (ins != null) {
+                insignias.add(ins);
+            }
+        }
         logger.info("Insignias de usuario " + id_usuario + ": " + insignias);
         return insignias;
     }

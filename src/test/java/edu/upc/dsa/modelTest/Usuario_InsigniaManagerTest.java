@@ -1,8 +1,7 @@
 package edu.upc.dsa.modelTest;
 
 import edu.upc.dsa.manager.*;
-import edu.upc.dsa.models.Usuario_Insignia;
-import edu.upc.dsa.models.Usuario;
+import edu.upc.dsa.models.Insignia;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +43,7 @@ public class Usuario_InsigniaManagerTest {
         assertTrue(uim.asignarInsigniaAUsuario("888", "2")); // Tornillo
 
         // Obtener insignias
-        List<Usuario_Insignia> insignias = uim.getInsigniasDeUsuario("888");
+        List<Insignia> insignias = uim.getInsigniasDeUsuario("888");
         assertEquals(2, insignias.size());
 
         // Verificar contenido
@@ -61,14 +60,14 @@ public class Usuario_InsigniaManagerTest {
         assertTrue(uim.asignarInsigniaAUsuario("888", "3")); // Valor
 
         // Verificar que se asignó
-        List<Usuario_Insignia> insignias = uim.getInsigniasDeUsuario("888");
+        List<Insignia> insignias = uim.getInsigniasDeUsuario("888");
         assertEquals(1, insignias.size());
 
         // Eliminar la insignia
         assertTrue(uim.eliminarInsigniaDeUsuario("888", "3"));
 
         // Verificar que se eliminó
-        List<Usuario_Insignia> despues = uim.getInsigniasDeUsuario("888");
+        List<Insignia> despues = uim.getInsigniasDeUsuario("888");
         assertTrue(despues.isEmpty());
     }
 
@@ -77,12 +76,12 @@ public class Usuario_InsigniaManagerTest {
         uim.asignarInsigniaAUsuario("888", "1");
         uim.asignarInsigniaAUsuario("888", "2");
 
-        List<Usuario_Insignia> antes = uim.getInsigniasDeUsuario("888");
+        List<Insignia> antes = uim.getInsigniasDeUsuario("888");
         assertEquals(2, antes.size());
 
         uim.eliminarTodasInsigniasDeUsuario("888");
 
-        List<Usuario_Insignia> despues = uim.getInsigniasDeUsuario("888");
+        List<Insignia> despues = uim.getInsigniasDeUsuario("888");
         assertTrue(despues.isEmpty());
     }
 
@@ -96,7 +95,7 @@ public class Usuario_InsigniaManagerTest {
         assertFalse(resultadoDuplicado);
 
         // Verificar que solo hay una
-        List<Usuario_Insignia> insignias = uim.getInsigniasDeUsuario("888");
+        List<Insignia> insignias = uim.getInsigniasDeUsuario("888");
         assertEquals(1, insignias.size());
     }
 }

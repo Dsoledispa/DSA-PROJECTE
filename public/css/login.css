@@ -1,9 +1,605 @@
-body {
-    background-color: #f8f9fa;
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
   }
-  .card {
-    width: 100%;
-    max-width: 400px;
-    border-radius: 1rem;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  body {
+      font-family: 'Press Start 2P', monospace;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(180deg, #87CEEB 0%, #98FB98 40%, #228B22 100%);
+      position: relative;
+  }
+  /* Fondo animado con nubes pixel */
+  .background-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+  }
+  .cloud {
+      position: absolute;
+      background: #fff;
+      border-radius: 0;
+      opacity: 0.8;
+      animation: float-cloud linear infinite;
+  }
+  .cloud-1 {
+      width: 60px;
+      height: 20px;
+      top: 20%;
+      animation-duration: 20s;
+      animation-delay: 0s;
+  }
+  .cloud-2 {
+      width: 80px;
+      height: 25px;
+      top: 15%;
+      animation-duration: 25s;
+      animation-delay: -5s;
+  }
+  .cloud-3 {
+      width: 40px;
+      height: 15px;
+      top: 30%;
+      animation-duration: 18s;
+      animation-delay: -10s;
+  }
+  @keyframes float-cloud {
+      0% { transform: translateX(-100px); }
+      100% { transform: translateX(calc(100vw + 100px)); }
+  }
+  /* Partículas de aventura */
+  .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+  }
+  .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #FFD700;
+      animation: sparkle 3s infinite;
+  }
+  @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0); }
+      50% { opacity: 1; transform: scale(1); }
+  }
+  /* Contenedor principal */
+  .game-container {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+  }
+  .game-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 400px;
+  }
+  /* Sección del héroe (posición fija abajo-izquierda) */
+  .hero-section {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 15;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      animation: hero-entrance 2s ease-out;
+  }
+  .hero-character {
+      width: 150px;
+      height: 150px;
+      position: relative;
+      animation: hero-float 3s ease-in-out infinite;
+  }
+  .hero-character img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.4));
+  }
+  /* Globo de diálogo estilo videojuego */
+  .speech-bubble {
+      position: absolute;
+      bottom: 120px;
+      left: 120px;
+      background: #FFF;
+      border: 4px solid #2F2F2F;
+      border-radius: 0;
+      padding: 12px 16px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      color: #2F2F2F;
+      max-width: 200px;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+      animation: bubble-appear 1s ease-out 1s both, bubble-float 4s ease-in-out 2s infinite;
+      transform-origin: bottom left;
+  }
+  /* Cola del globo */
+  .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 20px;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 12px solid #FFF;
+      filter: drop-shadow(0px 4px 0px #2F2F2F);
+  }
+  /* Animaciones del héroe */
+  @keyframes hero-entrance {
+      0% {
+          transform: translateX(-200px) translateY(50px) scale(0.5);
+          opacity: 0;
+      }
+      70% {
+          transform: translateX(10px) translateY(-10px) scale(1.1);
+          opacity: 1;
+      }
+      100% {
+          transform: translateX(0) translateY(0) scale(1);
+          opacity: 1;
+      }
+  }
+  @keyframes hero-float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+  }
+  @keyframes bubble-appear {
+      0% {
+          transform: scale(0) rotate(-5deg);
+          opacity: 0;
+      }
+      50% {
+          transform: scale(1.1) rotate(1deg);
+          opacity: 0.8;
+      }
+      100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+      }
+  }
+  @keyframes bubble-float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
+  }
+  /* Efecto de carga del héroe */
+  .hero-charge {
+      animation: hero-charge-exit 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  @keyframes hero-charge-exit {
+      0% {
+          transform: translateX(0) translateY(0) scale(1);
+          filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.4));
+      }
+      30% {
+          transform: translateX(0) translateY(-30px) scale(1.2);
+          filter: drop-shadow(6px 6px 12px rgba(0,0,0,0.6)) brightness(1.2);
+      }
+      100% {
+          transform: translateX(300px) translateY(-50px) scale(2);
+          filter: drop-shadow(8px 8px 16px rgba(0,0,0,0.8)) brightness(1.5);
+          opacity: 0;
+      }
+  }
+  /* Logo del juego */
+  .game-logo {
+      text-align: center;
+      margin-bottom: 30px;
+      animation: bounce 2s infinite;
+  }
+  .game-title {
+      font-size: 24px;
+      color: #4169E1;
+      text-shadow: 3px 3px 0px #FFD700, 6px 6px 0px #FF4500;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+  }
+  .game-subtitle {
+      font-size: 12px;
+      color: #228B22;
+      text-shadow: 1px 1px 0px #FFF;
+  }
+  @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+  }
+  /* Panel de login */
+  .login-panel {
+      background: #8B4513;
+      border: 6px solid #654321;
+      border-radius: 0;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+      box-shadow:
+          inset 3px 3px 0px #D2691E,
+          inset -3px -3px 0px #5D4037,
+          0 0 0 3px #FFD700,
+          8px 8px 0px rgba(0,0,0,0.3);
+      animation: panel-enter 1s ease-out;
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  @keyframes panel-enter {
+      0% { transform: scale(0) rotate(180deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  /* Efectos de transición épica */
+  .zoom-out {
+      animation: epic-zoom-out 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  .hero-charge {
+      animation: hero-charge 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+  @keyframes epic-zoom-out {
+      0% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+      }
+      50% {
+          transform: scale(1.1) rotate(0deg);
+          opacity: 0.9;
+          box-shadow:
+              inset 3px 3px 0px #D2691E,
+              inset -3px -3px 0px #5D4037,
+              0 0 0 3px #FFD700,
+              0 0 50px rgba(255, 215, 0, 0.8);
+      }
+      100% {
+          transform: scale(20) rotate(360deg);
+          opacity: 0;
+          filter: blur(10px);
+      }
+  }
+  @keyframes hero-charge {
+      0% {
+          transform: translateX(0) translateY(0) scale(1);
+          filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.4));
+      }
+      30% {
+          transform: translateX(0) translateY(-30px) scale(1.2);
+          filter: drop-shadow(6px 6px 12px rgba(0,0,0,0.6)) brightness(1.2);
+      }
+      100% {
+          transform: translateX(300px) translateY(-50px) scale(2);
+          filter: drop-shadow(8px 8px 16px rgba(0,0,0,0.8)) brightness(1.5);
+          opacity: 0;
+      }
+  }
+  /* Overlay de transición */
+  .transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 0%, rgba(0,0,0,0.9) 100%);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.5s ease-in-out;
+  }
+  .transition-overlay.active {
+      opacity: 1;
+  }
+  /* Texto de entrada épico */
+  .epic-text {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFD700;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 24px;
+      text-shadow: 3px 3px 0px #8B4513, 0 0 20px #FFD700;
+      z-index: 10000;
+      opacity: 0;
+      animation: epic-text-appear 2s ease-in-out;
+  }
+  @keyframes epic-text-appear {
+      0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0);
+      }
+      30% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.2);
+      }
+      70% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.8);
+      }
+  }
+  /* Decoraciones del panel */
+  .panel-decoration {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #FFD700;
+      border: 2px solid #FF8C00;
+  }
+  .decoration-tl { top: -6px; left: -6px; }
+  .decoration-tr { top: -6px; right: -6px; }
+  .decoration-bl { bottom: -6px; left: -6px; }
+  .decoration-br { bottom: -6px; right: -6px; }
+  /* Tabs estilo pixel */
+  .pixel-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border: none;
+  }
+  .pixel-tab {
+      flex: 1;
+      padding: 12px 16px;
+      background: #6B4423;
+      border: 3px solid #4A4A4A;
+      color: #FFF;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+      margin-right: 5px;
+  }
+  .pixel-tab:last-child {
+      margin-right: 0;
+  }
+  .pixel-tab.active {
+      background: #228B22;
+      border-color: #FFD700;
+      transform: translateY(-3px);
+      box-shadow: 0 3px 0px #1F7A1F;
+  }
+  .pixel-tab:hover:not(.active) {
+      background: #8B6914;
+      transform: translateY(-1px);
+  }
+  /* Formularios */
+  .pixel-form {
+      display: none;
+  }
+  .pixel-form.active {
+      display: block;
+      animation: form-slide 0.5s ease-out;
+  }
+  @keyframes form-slide {
+      0% { opacity: 0; transform: translateX(20px); }
+      100% { opacity: 1; transform: translateX(0); }
+  }
+  /* Inputs estilo pixel */
+  .input-container {
+      position: relative;
+      margin-bottom: 15px;
+  }
+  .pixel-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: #F5DEB3;
+      border: 3px solid #8B4513;
+      color: #2F2F2F;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      transition: all 0.2s;
+  }
+  .pixel-input.has-toggle {
+      padding-right: 50px;
+  }
+  .pixel-input:focus {
+      outline: none;
+      border-color: #FFD700;
+      background: #FFFACD;
+      box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+  .pixel-input::placeholder {
+      color: #8B7355;
+  }
+  /* Botón de toggle para contraseña */
+  .password-toggle {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #8B4513;
+      border: 2px solid #654321;
+      color: #FFD700;
+      font-size: 12px;
+      width: 35px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-family: 'Press Start 2P', monospace;
+  }
+  .password-toggle:hover {
+      background: #A0522D;
+      border-color: #FFD700;
+      transform: translateY(-50%) scale(1.1);
+  }
+  .password-toggle:active {
+      transform: translateY(-50%) scale(0.95);
+  }
+  /* Botones estilo RPG */
+  .pixel-button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(180deg, #32CD32 0%, #228B22 100%);
+      border: 4px solid #228B22;
+      color: #FFF;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+  }
+  .pixel-button:hover {
+      background: linear-gradient(180deg, #3CB371 0%, #2E8B57 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0px #1F5F1F, 0 8px 10px rgba(0,0,0,0.3);
+  }
+  .pixel-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 0px #1F5F1F;
+  }
+  .pixel-button.register {
+      background: linear-gradient(180deg, #FF6347 0%, #DC143C 100%);
+      border-color: #DC143C;
+  }
+  .pixel-button.register:hover {
+      background: linear-gradient(180deg, #FF7F50 0%, #B22222 100%);
+  }
+  /* Efectos de click */
+  .pixel-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s;
+  }
+  .pixel-button:active::after {
+      width: 300px;
+      height: 300px;
+  }
+  /* Mensajes */
+  .message-area {
+      margin-top: 20px;
+      padding: 10px;
+      border: 2px solid transparent;
+      background: rgba(255,255,255,0.1);
+      font-size: 9px;
+      text-align: center;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+  .message-success {
+      border-color: #32CD32;
+      background: rgba(50, 205, 50, 0.2);
+      color: #006400;
+      animation: message-glow 2s infinite;
+  }
+  .message-error {
+      border-color: #FF4500;
+      background: rgba(255, 69, 0, 0.2);
+      color: #8B0000;
+      animation: shake 0.5s;
+  }
+  @keyframes message-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(50, 205, 50, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(50, 205, 50, 0.8); }
+  }
+  @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+  }
+  /* Iconos decorativos */
+  .icon-sword {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      color: #FFD700;
+      text-shadow: 2px 2px 0px #FF8C00;
+  }
+  /* Responsive */
+  @media (max-width: 768px) {
+      .hero-section {
+          bottom: 10px;
+          left: 10px;
+      }
+      .hero-character {
+          width: 120px;
+          height: 120px;
+      }
+      .speech-bubble {
+          bottom: 100px;
+          left: 100px;
+          font-size: 8px;
+          padding: 10px 12px;
+          max-width: 150px;
+      }
+  }
+  @media (max-width: 480px) {
+      .game-title { font-size: 18px; }
+      .login-panel { padding: 20px; margin: 10px; }
+      .pixel-tab { font-size: 9px; padding: 10px 12px; }
+      .pixel-input { font-size: 9px; }
+      .pixel-button { font-size: 10px; }
+      .password-toggle {
+          width: 30px;
+          height: 25px;
+          font-size: 10px;
+          right: 6px;
+      }
+      .pixel-input.has-toggle { padding-right: 42px; }
+      .epic-text {
+          font-size: 16px;
+      }
+      .hero-character {
+          width: 100px;
+          height: 100px;
+      }
+      .speech-bubble {
+          bottom: 80px;
+          left: 80px;
+          font-size: 7px;
+          padding: 8px 10px;
+          max-width: 120px;
+      }
+  }
+  /* Animación de carga */
+  .loading {
+      opacity: 0.7;
+      pointer-events: none;
+      position: relative;
+  }
+  .loading::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #FFD700;
+      border-top: 3px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+  }
+  @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
   }

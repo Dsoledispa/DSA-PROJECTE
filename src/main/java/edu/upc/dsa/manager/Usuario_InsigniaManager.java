@@ -1,12 +1,12 @@
 package edu.upc.dsa.manager;
 
-import edu.upc.dsa.models.Usuario_Insignia;
+import edu.upc.dsa.models.Insignia;
 
 import java.util.List;
 
 public interface Usuario_InsigniaManager {
 
-    List<Usuario_Insignia> getInsigniasDeUsuario(String id_usuario);
+    List<Insignia> getInsigniasDeUsuario(String id_usuario);
 
     boolean asignarInsigniaAUsuario(String id_usuario, String id_insignia);
 

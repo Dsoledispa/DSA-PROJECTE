@@ -2,6 +2,7 @@ package edu.upc.dsa.services;
 
 import edu.upc.dsa.manager.Usuario_InsigniaManager;
 import edu.upc.dsa.manager.Usuario_InsigniaManagerImpl;
+import edu.upc.dsa.models.Insignia;
 import edu.upc.dsa.models.Usuario_Insignia;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,13 +37,13 @@ public class Usuario_InsigniaService {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Insignias obtenidas correctamente",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Usuario_Insignia.class))),
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Insignia.class))),
             @ApiResponse(responseCode = "500", description = "Error al obtener insignias")
     })
     public Response getInsigniasDeUsuario() {
         try {
             String id_usuario = securityContext.getUserPrincipal().getName();
-            List<Usuario_Insignia> insignias = uim.getInsigniasDeUsuario(id_usuario);
+            List<Insignia> insignias = uim.getInsigniasDeUsuario(id_usuario);
             return Response.ok(insignias).build();
         } catch (Exception e) {
             logger.error("Error al obtener insignias del usuario", e);
