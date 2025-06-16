@@ -5,6 +5,7 @@ import edu.upc.dsa.db.orm.dao.DenunciaDAOImpl;
 import edu.upc.dsa.exceptions.denuncia.DenunciaNotFoundException;
 import edu.upc.dsa.exceptions.denuncia.DenunciaYaExisteException;
 import edu.upc.dsa.models.Denuncia;
+import edu.upc.dsa.util.RandomUtils;
 import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,10 @@ public class DenunciaManagerImpl implements DenunciaManager {
         if (denunciaDAO.getDenuncia(denuncia.getId_denuncia()) != null) {
             logger.error("Denuncia con id " + denuncia.getId_denuncia() + " ya existe");
             throw new DenunciaYaExisteException("Ya existe una denuncia con ese ID");
+        }
+        String id = denuncia.getId_denuncia();
+        if (id == null || id.trim().isEmpty() || "string".equalsIgnoreCase(id)) {
+            denuncia.setId_denuncia(RandomUtils.getId());
         }
         denunciaDAO.addDenuncia(denuncia);
         logger.info("Denuncia añadida: " + denuncia);

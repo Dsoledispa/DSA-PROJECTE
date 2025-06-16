@@ -5,6 +5,7 @@ import edu.upc.dsa.db.orm.dao.ConsultaDAOImpl;
 import edu.upc.dsa.exceptions.consulta.ConsultaNotFoundException;
 import edu.upc.dsa.exceptions.consulta.ConsultaYaExisteException;
 import edu.upc.dsa.models.Consulta;
+import edu.upc.dsa.util.RandomUtils;
 import org.apache.log4j.Logger;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,10 @@ public class ConsultaManagerImpl implements ConsultaManager {
         if (consultaDAO.getConsulta(consulta.getId_consulta()) != null) {
             logger.error("Consulta con id " + consulta.getId_consulta() + " ya existe");
             throw new ConsultaYaExisteException("Ya existe una consulta con ese ID");
+        }
+        String id = consulta.getId_consulta();
+        if (id == null || id.trim().isEmpty() || "string".equalsIgnoreCase(id)) {
+            consulta.setId_consulta(RandomUtils.getId());
         }
         consultaDAO.addConsulta(consulta);
         logger.info("Consulta añadida: " + consulta);
