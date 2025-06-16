@@ -106,7 +106,7 @@ function formulario() {
         };
         const ruta = tipo === "login" ? "login" : "register";
         const isEmulator = /Android/i.test(navigator.userAgent);
-        const baseUrl = isEmulator ? "http://10.0.2.2:8080/dsaApp" : "http://localhost:8080/dsaApp";
+        const baseUrl = isEmulator ? "http://10.0.2.2:8080/dsaApp" : "https://dsa1.upc.edu/dsaApp";
         // Mostrar loading
         form.classList.add('loading');
         try {
