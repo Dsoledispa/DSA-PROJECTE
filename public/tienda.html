@@ -2,65 +2,184 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Tienda del Guerrero</title>
+  <title>Tienda del Guerrero - Pixel Adventure</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tienda.css">
   <script src="js/auth.js"></script>
   <script src="js/tienda.js" defer></script>
 </head>
 <body>
-  <div class="container my-4">
-      <h1 class="text-center">Tienda del Guerrero</h1>
-      <!-- Mostrar las monedas disponibles de forma atractiva -->
-      <div id="monedasDisponibles" class="text-center mb-4">
-        <span class="fs-3 fw-bold">💰</span> 
-        <span id="monedasCantidad" class="fs-4">0 monedas</span>
+<!-- Efectos atmosféricos -->
+<div class="shop-atmosphere">
+  <div class="smoke-effect smoke-1"></div>
+  <div class="smoke-effect smoke-2"></div>
+  <div class="smoke-effect smoke-3"></div>
+</div>
+
+<!-- Header principal de la tienda -->
+<header class="shop-header">
+  <div class="header-container">
+    <!-- Logo de la tienda -->
+    <div class="shop-logo">
+      <div class="logo-frame">
+        <h1 class="shop-title">TIENDA DEL GUERRERO</h1>
+        <div class="shop-subtitle">🛡️ Bienvenido, aventurero 🗡️</div>
       </div>
-      <div id="categorias" class="my-3"></div>
-      <div id="productos" class="row g-4"></div>
+    </div>
+
+    <!-- Información de monedas -->
+    <div class="money-display" id="monedasDisponibles">
+      <div class="money-icon">💰</div>
+      <div class="money-amount">
+        <span id="monedasCantidad">Cargando...</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Contenido principal -->
+<div class="shop-container">
+  <!-- Filtros de categorías -->
+  <div class="category-filters">
+    <h3 class="filters-title">🏷️ CATEGORÍAS DE MERCANCÍA</h3>
+    <div class="category-buttons" id="categorias">
+      <!-- Se llenarán dinámicamente con JavaScript -->
+    </div>
   </div>
 
-  <!-- Botón flotante del carrito -->
-  <button id="btnCarrito" class="btn btn-primary position-fixed bottom-0 end-0 m-4 rounded-circle">
-      🛒
+  <!-- Escaparate de productos -->
+  <div class="products-showcase">
+    <div class="showcase-header">
+      <h2 class="showcase-title">⚒️ MERCANCÍA DISPONIBLE ⚒️</h2>
+    </div>
+    <div class="products-grid" id="productos">
+      <!-- Los productos se cargarán aquí dinámicamente -->
+    </div>
+  </div>
+
+  <!-- Navegación -->
+  <div class="shop-navigation">
+    <a href="partida.html" class="nav-button" id="irPartidaBtn">
+      🏰 Volver a la Aventura
+    </a>
+  </div>
+</div>
+
+<!-- Carrito flotante -->
+<div class="cart-float">
+  <button class="cart-button" id="btnCarrito">
+    🛒
+    <span class="cart-count d-none" id="cartCount">0</span>
   </button>
+</div>
 
-  <!-- Modal del carrito -->
-  <div class="modal fade" id="modalCarrito" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Carrito</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <table class="table">
-            <thead><tr><th>Nombre</th><th>Precio</th><th>Categoría</th><th></th></tr></thead>
-            <tbody id="tablaCarrito"></tbody>
-          </table>
-          <div class="text-end fw-bold">Total: <span id="totalCarrito">0</span> monedas</div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          <button id="comprarBtn" class="btn btn-success">Comprar</button>
-        </div>
+<!-- Modal del carrito mejorado -->
+<div class="cart-modal" id="modalCarrito">
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-panel">
+    <div class="cart-header">
+      <h3 class="cart-title">🛒 Tu Carrito de Compras</h3>
+      <button class="cart-close" id="cartClose">×</button>
+    </div>
+
+    <div class="cart-body">
+      <table class="cart-table">
+        <thead>
+        <tr>
+          <th>Artículo</th>
+          <th>Precio</th>
+          <th>Categoría</th>
+          <th>Acción</th>
+        </tr>
+        </thead>
+        <tbody id="tablaCarrito">
+        <!-- Items del carrito se llenarán aquí -->
+        </tbody>
+      </table>
+
+      <div class="cart-total">
+        <strong>Total: <span id="totalCarrito">0</span> monedas 💰</strong>
       </div>
     </div>
-  </div>
 
-  <!-- Botón de redirección a partida -->
-  <div class="text-center mt-4">
-  <button id="irPartidaBtn" class="btn btn-secondary">Ir a la Partida</button>
-  </div>
-
-  <!-- Spinner de carga -->
-  <div id="spinner" class="spinner-overlay d-none">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
+    <div class="cart-footer">
+      <button class="cart-action cart-clear" id="clearCartBtn">
+        🗑️ Vaciar Carrito
+      </button>
+      <button class="cart-action cart-purchase" id="comprarBtn">
+        ⚡ Realizar Compra
+      </button>
     </div>
   </div>
+</div>
+
+<!-- Sistema de notificaciones -->
+<div class="notification-system" id="notificationSystem">
+  <!-- Las notificaciones se crearán dinámicamente -->
+</div>
+
+<!-- Spinner de carga -->
+<div class="loading-overlay d-none" id="spinner">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- Template para tarjetas de productos -->
+<template id="productTemplate">
+  <div class="product-card">
+    <div class="product-image">
+      <img src="" alt="" class="product-img" onerror="this.src='img/objeto.png'">
+    </div>
+    <div class="product-details">
+      <h4 class="product-name"></h4>
+      <p class="product-description"></p>
+      <div class="product-price">
+        <span class="price-icon">💰</span>
+        <span class="price-value"></span> monedas
+      </div>
+      <div class="product-category"></div>
+      <button class="add-to-cart-btn">
+        ⚔️ Añadir al Carrito
+      </button>
+    </div>
+  </div>
+</template>
+
+<!-- Template para items del carrito -->
+<template id="cartItemTemplate">
+  <tr class="cart-item">
+    <td>
+      <div class="d-flex align-items-center">
+        <img src="" alt="" class="cart-item-image" onerror="this.src='img/objeto.png'">
+        <div class="cart-item-name"></div>
+      </div>
+    </td>
+    <td class="item-price"></td>
+    <td class="item-category"></td>
+    <td>
+      <button class="remove-item">🗑️</button>
+    </td>
+  </tr>
+</template>
+
+<!-- Template para botones de categoría -->
+<template id="categoryTemplate">
+  <button class="category-btn" data-cat="">
+    <span class="category-name"></span>
+  </button>
+</template>
+
+<!-- Template para notificaciones -->
+<template id="notificationTemplate">
+  <div class="notification">
+    <div class="notification-icon"></div>
+    <div class="notification-text"></div>
+  </div>
+</template>
 </body>
 </html>

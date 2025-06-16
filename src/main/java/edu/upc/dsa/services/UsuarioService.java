@@ -11,12 +11,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 import java.util.Date;
 
@@ -27,6 +30,9 @@ public class UsuarioService {
     final static Logger logger = Logger.getLogger(UsuarioService.class);
     private UsuarioManager um = new UsuarioManagerImpl();
     private static final String secretKey = "d42a2373271508dae325e933cddcfe13d504512272bdb6e89123f2e80717ad9d";
+
+    @Context
+    SecurityContext securityContext;
 
     // Generar token JWT
     private String generateToken(Usuario u) {
@@ -83,6 +89,29 @@ public class UsuarioService {
         } catch (Exception e) {
             logger.error("Error en login", e);
             return Response.serverError().entity("{\"error\":\"Error interno en login\"}").build();
+        }
+    }
+
+    @GET
+    @Operation(
+            summary = "Obtener información del usuario autenticado",
+            description = "Devuelve la información del usuario autenticado mediante JWT",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @Path("/me")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCurrentUser() {
+        try {
+            String id_usuario = securityContext.getUserPrincipal().getName();
+            Usuario usuario = this.um.getUsuario(id_usuario);
+            usuario.setPassword(null); // No devolver la contraseña
+            logger.info("Usuario autenticado obtenido: " + usuario.getNombre());
+            return Response.ok(usuario).build();
+        } catch (UsuarioNotFoundException e) {
+            return Response.status(404).entity("{\"error\":\"Usuario no encontrado\"}").build();
+        } catch (Exception e) {
+            logger.error("Error al obtener usuario actual", e);
+            return Response.serverError().entity("{\"error\":\"Error interno al obtener usuario\"}").build();
         }
     }
 
@@ -161,7 +190,6 @@ public class UsuarioService {
             return Response.serverError().entity("{\"error\":\"Error interno al actualizar usuario\"}").build();
         }
     }
-
 
     @DELETE
     @Operation(summary = "Eliminar usuario", description = "Elimina el usuario con el nombre dado")

@@ -1,32 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/inventario.css">
     <script src="js/auth.js"></script>
     <script src="js/inventario.js" defer></script>
-    <title>Inventario</title>
+    <title>Inventario del Aventurero - Pixel Adventure</title>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Inventario de la Partida</h2>
-        <div id="inventario-list" class="row">
-            <!-- Aquí se llenarán los objetos del inventario con JS -->
-        </div>
-        <!-- Botón de redirección a partida -->
-        <div class="text-center mt-4">
-            <a href="partida.html" class="btn btn-primary">Volver a la Partida</a>
+<!-- Efectos ambientales -->
+<div class="inventory-atmosphere"></div>
+
+<!-- Header del inventario -->
+<header class="inventory-header">
+    <div class="header-container">
+        <div class="inventory-logo">
+            <h1 class="inventory-title">INVENTARIO DEL AVENTURERO</h1>
+            <div class="inventory-subtitle">🎒 Tu equipamiento personal 🗡️</div>
         </div>
     </div>
-    <!-- Spinner de carga -->
-    <div id="spinner" class="spinner-overlay d-none">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
+</header>
+
+<!-- Contenido principal -->
+<div class="inventory-container">
+    <!-- Estadísticas del inventario -->
+    <div class="inventory-stats">
+        <div class="stat-item">
+            <div class="stat-value" id="totalItems">0</div>
+            <div class="stat-label">📦 Objetos</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="totalValue">0</div>
+            <div class="stat-label">💰 Valor Total</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="rareItems">0</div>
+            <div class="stat-label">✨ Raros</div>
+        </div>
     </div>
+
+    <!-- Showcase del inventario -->
+    <div class="inventory-showcase">
+        <div class="showcase-header">
+            <h2 class="showcase-title">🎒 TUS POSESIONES 🎒</h2>
+        </div>
+        <div class="inventory-grid" id="inventario-list">
+            <!-- Los items del inventario se cargarán aquí -->
+        </div>
+    </div>
+
+    <!-- Navegación -->
+    <div class="inventory-navigation">
+        <a href="partida.html" class="nav-button">
+            🏰 Regresar a la Aventura
+        </a>
+    </div>
+</div>
+
+<!-- Tooltip para información adicional -->
+<div class="tooltip" id="itemTooltip">
+    <div class="tooltip-content"></div>
+</div>
+
+<!-- Spinner de carga -->
+<div class="loading-overlay d-none" id="spinner">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Organizando tu inventario...</div>
+</div>
+
+<!-- Template para items del inventario -->
+<template id="inventoryItemTemplate">
+    <div class="inventory-item">
+        <div class="item-image">
+            <img src="" alt="" class="item-img" onerror="this.src='img/objeto.png'">
+        </div>
+        <div class="item-details">
+            <h4 class="item-name"></h4>
+            <p class="item-description"></p>
+            <div class="item-value">
+                <span class="value-icon">💰</span>
+                <span class="value-amount"></span> monedas
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Template para estado vacío -->
+<template id="emptyInventoryTemplate">
+    <div class="empty-inventory">
+        <div class="empty-icon">🎒</div>
+        <div class="empty-message">Tu inventario está vacío</div>
+        <div class="empty-submessage">¡Ve a la tienda para conseguir equipamiento épico!</div>
+    </div>
+</template>
 </body>
 </html>

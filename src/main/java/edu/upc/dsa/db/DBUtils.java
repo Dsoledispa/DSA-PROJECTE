@@ -17,9 +17,9 @@ public class DBUtils {
     // Puerto por defecto de MariaDB
     private static final String PORT = "3306";
     // Usuario de la base de datos
-    private static final String USER = "diego";
+    private static final String USER = "root";
     // Contraseña del usuario
-    private static final String PASS = "1234";
+    private static final String PASS = "Carretera";
 
     // Cargamos el driver al iniciar la clase
     static {

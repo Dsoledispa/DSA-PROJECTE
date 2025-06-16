@@ -1,30 +1,560 @@
-.no-image {
-    text-align: center;
-    padding: 20px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #888;
-    font-size: 14px;
+/* === INVENTARIO PIXEL ART CSS === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-.card-img-top {
-    max-height: 180px;
-    object-fit: cover;
-    width: 100%;
+
+:root {
+    /* Paleta de colores del inventario */
+    --bag-brown: #8B4513;
+    --bag-light: #D2B48C;
+    --bag-dark: #654321;
+    --bag-darker: #3D2914;
+
+    --leather-main: #A0522D;
+    --leather-light: #CD853F;
+    --leather-dark: #8B4513;
+
+    --gold-bright: #FFD700;
+    --gold-main: #FFA500;
+    --gold-dark: #FF8C00;
+
+    --green-bright: #32CD32;
+    --green-main: #228B22;
+
+    --parchment: #F5F5DC;
+    --parchment-dark: #F0E68C;
+    --text-dark: #2F2F2F;
+
+    --shadow-dark: rgba(47, 47, 47, 0.8);
+    --shadow-medium: rgba(47, 47, 47, 0.6);
+    --shadow-light: rgba(47, 47, 47, 0.3);
+
+    --font-pixel: 'Press Start 2P', monospace;
+
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
-/* Spinner de carga */
-.spinner-overlay {
+
+body {
+    font-family: var(--font-pixel);
+    background: linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 50%, var(--bag-light) 100%);
+    color: var(--text-dark);
+    min-height: 100vh;
+    position: relative;
+}
+
+/* === EFECTOS AMBIENTALES === */
+.inventory-atmosphere {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
 }
 
+.inventory-atmosphere::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 200%;
+    background-image:
+        radial-gradient(1px 1px at 20% 30%, var(--gold-main), transparent),
+        radial-gradient(2px 2px at 70% 20%, var(--gold-dark), transparent),
+        radial-gradient(1px 1px at 10% 80%, var(--gold-bright), transparent);
+    background-size: 200px 200px, 300px 300px, 250px 250px;
+    animation: drift-particles 30s infinite linear;
+    opacity: 0.2;
+}
+
+@keyframes drift-particles {
+    0% { transform: translateY(100%) translateX(0); }
+    100% { transform: translateY(-100%) translateX(20px); }
+}
+
+/* === HEADER DEL INVENTARIO === */
+.inventory-header {
+    background: linear-gradient(180deg, var(--bag-brown) 0%, var(--bag-dark) 100%);
+    border-bottom: 6px solid var(--leather-dark);
+    padding: 25px 0;
+    box-shadow: 0 6px 25px var(--shadow-dark);
+    position: relative;
+    z-index: 10;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.inventory-logo {
+    background: var(--leather-main);
+    border: 4px solid var(--gold-main);
+    padding: 20px 40px;
+    display: inline-block;
+    position: relative;
+    box-shadow:
+        inset 0 0 20px var(--shadow-medium),
+        0 6px 20px var(--shadow-dark);
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+
+.inventory-title {
+    font-size: 18px;
+    color: var(--gold-bright);
+    text-shadow: 3px 3px 0px var(--bag-darker);
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.inventory-subtitle {
+    font-size: 9px;
+    color: var(--gold-main);
+    margin-top: 8px;
+    letter-spacing: 1px;
+}
+
+/* Decoraciones del logo */
+.inventory-logo::before,
+.inventory-logo::after {
+    content: '🎒';
+    position: absolute;
+    top: -10px;
+    font-size: 20px;
+    color: var(--gold-bright);
+}
+
+.inventory-logo::before { left: 15px; }
+.inventory-logo::after { right: 15px; }
+
+/* === CONTENIDO PRINCIPAL === */
+.inventory-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 5;
+}
+
+/* === SECCIÓN DEL INVENTARIO === */
+.inventory-showcase {
+    background: var(--parchment);
+    border: 6px solid var(--bag-darker);
+    box-shadow:
+        inset 0 0 30px var(--shadow-light),
+        0 8px 25px var(--shadow-dark);
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.showcase-header {
+    background: var(--bag-brown);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 4px solid var(--bag-darker);
+    position: relative;
+}
+
+.showcase-title {
+    font-size: 14px;
+    color: var(--gold-bright);
+    text-shadow: 2px 2px 0px var(--bag-darker);
+    margin: 0;
+}
+
+/* Decoración del header */
+.showcase-header::before,
+.showcase-header::after {
+    content: '⚔️';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--gold-main);
+}
+
+.showcase-header::before { left: 20px; }
+.showcase-header::after { right: 20px; }
+
+/* === GRID DE ITEMS === */
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 30px;
+    min-height: 300px;
+}
+
+/* === TARJETAS DE ITEMS === */
+.inventory-item {
+    background: linear-gradient(145deg, var(--parchment), var(--parchment-dark));
+    border: 4px solid var(--leather-dark);
+    position: relative;
+    transition: var(--transition-medium);
+    box-shadow: 0 4px 15px var(--shadow-medium);
+    overflow: hidden;
+}
+
+.inventory-item:hover {
+    transform: translateY(-5px) rotate(-1deg);
+    border-color: var(--gold-main);
+    box-shadow: 0 8px 25px var(--shadow-dark);
+}
+
+.inventory-item::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--gold-main), var(--gold-bright));
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transition-fast);
+}
+
+.inventory-item:hover::before {
+    opacity: 0.2;
+}
+
+.item-image {
+    width: 100%;
+    height: 160px;
+    background: var(--bag-light);
+    border-bottom: 3px solid var(--leather-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.item-image img {
+    max-width: 100px;
+    max-height: 100px;
+    image-rendering: pixelated;
+    filter: drop-shadow(2px 2px 4px var(--shadow-medium));
+    transition: var(--transition-medium);
+}
+
+.inventory-item:hover .item-image img {
+    transform: scale(1.1);
+}
+
+.item-details {
+    padding: 20px;
+}
+
+.item-name {
+    font-size: 11px;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 0px var(--parchment);
+}
+
+.item-description {
+    font-size: 7px;
+    color: var(--bag-dark);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.item-value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 9px;
+    color: var(--gold-dark);
+    font-weight: bold;
+}
+
+.value-icon {
+    font-size: 12px;
+    color: var(--gold-bright);
+}
+
+/* Rareza de items */
+.inventory-item.common {
+    border-color: #8B8B8B;
+}
+
+.inventory-item.uncommon {
+    border-color: #32CD32;
+}
+
+.inventory-item.rare {
+    border-color: #4169E1;
+}
+
+.inventory-item.epic {
+    border-color: #9370DB;
+}
+
+.inventory-item.legendary {
+    border-color: #FFD700;
+    box-shadow: 0 4px 15px var(--shadow-medium), 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+/* === ESTADO VACÍO === */
+.empty-inventory {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-dark);
+    grid-column: 1 / -1;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 25px;
+    opacity: 0.6;
+    color: var(--bag-dark);
+}
+
+.empty-message {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--text-dark);
+    text-shadow: 1px 1px 0px var(--parchment);
+}
+
+.empty-submessage {
+    font-size: 9px;
+    opacity: 0.8;
+    color: var(--bag-dark);
+}
+
+/* === NAVEGACIÓN === */
+.inventory-navigation {
+    text-align: center;
+    padding: 20px;
+}
+
+.nav-button {
+    background: linear-gradient(145deg, var(--bag-brown), var(--bag-dark));
+    border: 4px solid var(--leather-dark);
+    color: var(--gold-bright);
+    padding: 15px 30px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: var(--transition-medium);
+    font-family: var(--font-pixel);
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 4px 0px var(--bag-darker);
+    letter-spacing: 1px;
+}
+
+.nav-button:hover {
+    background: linear-gradient(145deg, var(--leather-main), var(--bag-brown));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0px var(--bag-darker), 0 10px 15px var(--shadow-dark);
+    color: var(--gold-bright);
+    text-decoration: none;
+}
+
+.nav-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0px var(--bag-darker);
+}
+
+/* === ESTADÍSTICAS DEL INVENTARIO === */
+.inventory-stats {
+    background: var(--bag-light);
+    border: 4px solid var(--leather-dark);
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--shadow-medium);
+}
+
+.stat-item {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 16px;
+    color: var(--gold-dark);
+    text-shadow: 1px 1px 0px var(--parchment);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 8px;
+    color: var(--text-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* === SPINNER DE CARGA === */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(47, 47, 47, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--bag-light);
+    border-top: 4px solid var(--gold-main);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    color: var(--gold-bright);
+    font-size: 10px;
+    text-shadow: 1px 1px 0px var(--bag-darker);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === TOOLTIP === */
+.tooltip {
+    position: absolute;
+    background: var(--bag-darker);
+    color: var(--gold-bright);
+    padding: 8px 12px;
+    font-size: 7px;
+    border: 2px solid var(--gold-main);
+    box-shadow: 0 4px 15px var(--shadow-dark);
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+
+.tooltip.show {
+    opacity: 1;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    .inventory-title {
+        font-size: 14px;
+    }
+
+    .inventory-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .inventory-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-button {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+    }
+
+    .empty-message {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .inventory-title {
+        font-size: 12px;
+    }
+
+    .inventory-grid {
+        padding: 15px;
+    }
+
+    .item-details {
+        padding: 15px;
+    }
+
+    .item-name {
+        font-size: 10px;
+    }
+
+    .item-description {
+        font-size: 6px;
+    }
+
+    .nav-button {
+        font-size: 9px;
+        padding: 12px 25px;
+    }
+}
+
+/* === UTILIDADES === */
 .d-none {
     display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* === ANIMACIONES ADICIONALES === */
+@keyframes item-appear {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.inventory-item.animate-in {
+    animation: item-appear 0.4s ease-out;
+}
+
+/* === EFECTOS DE HOVER MEJORADOS === */
+.inventory-item:hover .item-name {
+    color: var(--gold-dark);
+    text-shadow: 1px 1px 0px var(--parchment), 0 0 10px var(--gold-main);
+}
+
+.inventory-item:hover .item-value {
+    color: var(--gold-bright);
+}
+
+/* === BRILLO PARA ITEMS ESPECIALES === */
+.inventory-item.legendary {
+    animation: legendary-glow 3s ease-in-out infinite;
+}
+
+@keyframes legendary-glow {
+    0%, 100% {
+        box-shadow: 0 4px 15px var(--shadow-medium), 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 15px var(--shadow-medium), 0 0 30px rgba(255, 215, 0, 0.6);
+    }
 }
